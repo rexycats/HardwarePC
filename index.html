@@ -1,0 +1,915 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PC-hardware oefenapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: werkbank — vaste kopbalk met tabbladen, daaronder een lijst links en een werkvlak rechts (stapelt op gsm) */
+:root{
+  --bg:#F4F1EA; --surface:#FFFDF8; --sunk:#ECE7DC; --line:#DDD5C6;
+  --ink:#16233B; --ink-2:#44506A; --muted:#6A7285;
+  --accent:#B34B12; --accent-soft:#FBE3D0; --accent-ink:#7A300A;
+  --blue:#1F5F8B; --blue-soft:#DDEAF4;
+  --good:#1E7A45; --good-soft:#DDF1E4; --bad:#B42318; --bad-soft:#FBE1DE; --warn:#8A5A00; --warn-soft:#FBEFD3;
+  --img-bg:#FFFFFF; --head:#16233B; --head-ink:#F4F1EA; --head-muted:#AFC0D6;
+  --display:'Rubik', 'Trebuchet MS', Arial, sans-serif;
+  --body:'Nunito Sans', 'Segoe UI', Arial, sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1726; --surface:#172238; --sunk:#111B2D; --line:#2A3A57;
+  --ink:#EEF1F6; --ink-2:#C3CBDA; --muted:#94A0B6;
+  --accent:#F29A5E; --accent-soft:#3A2618; --accent-ink:#FFC9A3;
+  --blue:#7FB6E0; --blue-soft:#18304A;
+  --good:#6FD39A; --good-soft:#133524; --bad:#FF8A7E; --bad-soft:#3D1B19; --warn:#F2C46B; --warn-soft:#3A2E12;
+  --img-bg:#F6F4EF; --head:#0A111E; --head-ink:#EEF1F6; --head-muted:#94A0B6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1726; --surface:#172238; --sunk:#111B2D; --line:#2A3A57;
+  --ink:#EEF1F6; --ink-2:#C3CBDA; --muted:#94A0B6;
+  --accent:#F29A5E; --accent-soft:#3A2618; --accent-ink:#FFC9A3;
+  --blue:#7FB6E0; --blue-soft:#18304A;
+  --good:#6FD39A; --good-soft:#133524; --bad:#FF8A7E; --bad-soft:#3D1B19; --warn:#F2C46B; --warn-soft:#3A2E12;
+  --img-bg:#F6F4EF; --head:#0A111E; --head-ink:#EEF1F6; --head-muted:#94A0B6; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;margin:0}
+h1,h2,h3,h4{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+p{margin:0}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--head);color:var(--head-ink)}
+.top-in{max-width:1200px;margin:0 auto;padding:12px 16px 0;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px}
+.brand{display:flex;align-items:baseline;gap:10px;flex:1;min-width:0}
+.brand h1{font-size:20px;font-weight:600}
+.brand span{color:var(--head-muted);font-size:13px}
+@media (max-width:520px){.brand span{display:none}.brand h1{font-size:18px}}
+.teach{background:transparent;border:1px solid var(--head-muted);color:var(--head-ink);border-radius:999px;padding:4px 14px;font-size:14px;cursor:pointer}
+.tabs{width:100%;display:flex;gap:4px;overflow-x:auto}
+.tab{background:transparent;border:0;border-bottom:3px solid transparent;color:var(--head-muted);padding:10px 14px 9px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--head-ink);border-bottom-color:var(--accent)}
+.tab .lock{font-size:12px;margin-left:6px;padding:1px 7px;border-radius:999px;background:#ffffff22}
+main{max-width:1200px;margin:0 auto;padding-inline:16px;padding-block:24px 64px}
+.lead{max-width:68ch;color:var(--ink-2)}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.split{display:grid;grid-template-columns:280px minmax(0,1fr);gap:24px;align-items:start}
+@media (max-width:820px){.split{grid-template-columns:minmax(0,1fr)}}
+.side{display:flex;flex-direction:column;gap:6px;position:sticky;top:120px}
+@media (max-width:820px){.side{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}}
+.navbtn{display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;min-width:0}
+@media (max-width:820px){.navbtn{min-width:200px}}
+.navbtn[aria-current="true"]{border-color:var(--accent);box-shadow:inset 4px 0 0 var(--accent)}
+.navbtn small{display:block;color:var(--muted);font-size:12px}
+.pill{font-size:12px;font-weight:800;border-radius:999px;padding:2px 9px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.todo{background:var(--sunk);color:var(--muted)}
+.pill.opt{background:var(--blue-soft);color:var(--blue)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:24px;display:flex;flex-direction:column;gap:18px;min-width:0}
+@media (max-width:520px){.panel{padding:16px}}
+.panel h2{font-size:26px;font-weight:600}
+.panel h3{font-size:19px;font-weight:600}
+.prose{display:flex;flex-direction:column;gap:12px;max-width:72ch}
+.prose ul,.prose ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:4px}
+.box{border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.box h4{font-size:15px;font-weight:700;letter-spacing:.02em}
+.box.onthoud{background:var(--accent-soft);border-left:5px solid var(--accent)}
+.box.onthoud h4{color:var(--accent-ink)}
+.box.vgl{background:var(--blue-soft)}
+.box.vgl h4{color:var(--blue)}
+.box.vb{background:var(--sunk)}
+.fig{display:flex;flex-wrap:wrap;gap:12px}
+.fig figure{margin:0;background:var(--img-bg);border:1px solid var(--line);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:4px;width:200px;max-width:100%}
+.fig img{width:100%;height:130px;object-fit:contain}
+.fig figcaption{font-size:13px;color:#3C4658;text-align:center}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{font-family:var(--display);font-weight:600;background:var(--sunk)}
+td.num{font-variant-numeric:tabular-nums}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:800;cursor:pointer;background:var(--ink);color:var(--bg)}
+.btn.acc{background:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.acc{color:#1a0d04}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.acc{color:#1a0d04}}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.q{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px}
+.q .prompt{font-size:18px;font-weight:700}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:10px 14px;cursor:pointer}
+.opt[aria-pressed="true"]{border-color:var(--blue);background:var(--blue-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+input[type=text],input[type=number],select{background:var(--surface);border:2px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0;max-width:100%}
+input.bad{border-color:var(--bad)} input.good{border-color:var(--good)}
+.fb{border-radius:10px;padding:12px 14px}
+.fb.ok{background:var(--good-soft);color:var(--ink)} .fb.ok b:first-child{color:var(--good)}
+.fb.no{background:var(--bad-soft);color:var(--ink)} .fb.no b:first-child{color:var(--bad)}
+.fb.hint{background:var(--warn-soft)} .fb.sol{background:var(--blue-soft)}
+.ordersel{display:flex;flex-wrap:wrap;gap:8px}
+.ordersel button{background:var(--surface);border:2px dashed var(--line);border-radius:10px;padding:8px 12px;cursor:pointer;text-align:left}
+.ordersel button:disabled{opacity:.35}
+.chosen{display:flex;flex-direction:column;gap:6px;margin:0;padding-left:24px}
+.stepper{display:flex;flex-direction:column;gap:8px}
+.stepper .st{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+details.uitleg{border:1px solid var(--line);border-radius:12px;padding:0}
+details.uitleg>summary{cursor:pointer;padding:12px 16px;font-weight:800;font-family:var(--display)}
+details.uitleg>div{padding:0 16px 16px;display:flex;flex-direction:column;gap:14px}
+.progress{height:10px;background:var(--sunk);border-radius:999px;overflow:hidden}
+.progress>i{display:block;height:100%;background:var(--accent)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label{font-weight:700;font-size:14px}
+.field .help{font-size:13px;color:var(--muted)}
+.msg{font-size:14px;border-radius:8px;padding:6px 10px}
+.msg.ok{background:var(--good-soft);color:var(--good)} .msg.no{background:var(--bad-soft);color:var(--bad)} .msg.warn{background:var(--warn-soft);color:var(--warn)}
+.report{border:2px solid var(--ink);border-radius:14px;padding:22px;background:var(--surface);display:flex;flex-direction:column;gap:14px;max-width:760px}
+.report .code{font-family:ui-monospace,Consolas,monospace;font-size:22px;font-weight:700;letter-spacing:.08em;background:var(--sunk);border-radius:8px;padding:8px 12px;display:inline-block}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 16px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--sunk);border-radius:99px;overflow:hidden;min-width:60px}
+.bar>i{display:block;height:100%;background:var(--blue)}
+.modal{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;padding:16px;z-index:50}
+.modal>div{background:var(--surface);border-radius:14px;padding:22px;max-width:560px;width:100%;max-height:90vh;overflow:auto;display:flex;flex-direction:column;gap:14px}
+.glos{display:grid;grid-template-columns:minmax(120px,220px) 1fr;gap:6px 18px}
+.glos dt{font-weight:800} .glos dd{margin:0;color:var(--ink-2)}
+@media (max-width:520px){.glos{grid-template-columns:1fr}.glos dd{margin-bottom:8px}}
+.chaps{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;cursor:pointer;font-weight:700;font-size:14px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tj{display:flex;flex-direction:column;gap:12px}
+.lockbox{background:var(--warn-soft);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.checklist{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:6px}
+.checklist li{display:flex;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:14px}
+.small{font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.fb,.st{animation:in .25s ease-out}@keyframes in{from{opacity:.4;transform:translateY(3px)}to{opacity:1;transform:none}}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><h1>PC-hardware oefenapp</h1><span>chipset · processor · koeling · ROM · RAM</span></div>
+    <button class="teach" id="teachBtn" type="button">Leerkracht</button>
+    <nav class="tabs" role="tablist" aria-label="Onderdelen van de app">
+      <button class="tab" role="tab" id="tab-theorie" data-tab="theorie">Theorie</button>
+      <button class="tab" role="tab" id="tab-oefenen" data-tab="oefenen">Oefenen</button>
+      <button class="tab" role="tab" id="tab-praktijk" data-tab="praktijk">Praktijk</button>
+      <button class="tab" role="tab" id="tab-toets" data-tab="toets">Eindtoets <span class="lock" id="tabLock"></span></button>
+    </nav>
+  </div>
+</header>
+<main id="main"></main>
+<div id="modalRoot"></div>
+
+<script>
+"use strict";
+/* ---------- opslag ---------- */
+const KEY='pchw-oefenapp-v1';
+let S={naam:'',klas:'',prog:{},unlocked:false,prak:{},toets:null,lastTab:'theorie'};
+try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ---------- hulpjes ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pickN(a,n){return shuffle(a).slice(0,n);}
+function parseNum(v){const m=String(v==null?'':v).replace(/\s/g,'').replace(',','.').match(/-?\d+(\.\d+)?/);return m?+m[0]:null;}
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+
+/* ---------- hoofdstukken en woordenlijst ---------- */
+const CH={H1:'De computer en zijn onderdelen',H2:'De chipset',H3:'Processoren op de markt',H4:'Processorkoelers',H5:'ROM-geheugen',H6:'RAM-geheugen',P:'Praktijk: waar zit het probleem?'};
+const G={
+'Processor (CPU)':['Central Processing Unit. Voert alle berekeningen uit: de chef-kok.','H1'],
+'Werkgeheugen (RAM)':['Geheugen voor wat nu open staat. Vluchtig: zonder stroom is alles weg. Het werkblad.','H1'],
+'Opslag (SSD/HDD)':['Bewaart bestanden blijvend, ook zonder stroom. De voorraadkast.','H1'],
+'ROM':['Read Only Memory: bevat vaste instructies (firmware) en houdt die zonder stroom.','H5'],
+'Moederbord':['Motherboard: grote printplaat waarop alle onderdelen worden aangesloten.','H1'],
+'Bus':['Bundel geleiders waarlangs gegevens reizen: een snelweg voor gegevens (bv. FSB, adresbus, databus).','H2'],
+'Systeembus':['De bus tussen processor, chipset en geheugen; bestaat uit o.a. een adresbus en een databus.','H6'],
+'Klokpuls':['Eén tik van de klokgenerator. Alle onderdelen werken op de maat van die tikken.','H2'],
+'Uitbreidingssleuf':['Sleuf op het moederbord waarin je een extra kaart steekt, bv. een grafische kaart.','H2'],
+'Optisch station':['Cd-, dvd- of Blu-ray-station: leest schijfjes met een laser.','H2'],
+'Chipset':['Groep chips op het moederbord die het verkeer regelt tussen processor, geheugen en randapparaten: de verkeersagent.','H2'],
+'Voeding (PSU)':['Power Supply Unit: zet 230 V wisselspanning (AC) om in gelijkspanning (DC) voor alle onderdelen.','H1'],
+'Koeler':['Voert de warmte van de processor af: de dampkap.','H1'],
+'Grafische kaart (GPU)':['Maakt het beeld voor je scherm. Nodig voor zware games, 3D en video.','H1'],
+'SATA-kabel':['Datakabel tussen moederbord en harde schijf, SSD of dvd-station.','H1'],
+'Behuizing':['De kast (case) die alles beschermt tegen stof en stoten.','H1'],
+'Randapparaat':['Toestel rond de computer: toetsenbord, muis, scherm, printer, luidspreker.','H1'],
+'System controller':['Functie van de chipset: klokgenerator, interrupts, DMA en energiebeheer.','H2'],
+'Peripheral controller':['Functie van de chipset: uitbreidingskaarten, HDD/optische stations, toetsenbord, I/O controller randapparaten.','H2'],
+'Memory controller':['Functie van de chipset: besturing van het werkgeheugen.','H2'],
+'Klokgenerator':['Het "uurwerk" dat de maat (klokpulsen) aangeeft voor alle onderdelen.','H2'],
+'North bridge':['Chip van de chipset die de processor verbindt met de snellere onderdelen (RAM, grafische kaart). Intel: MCH/GMCH.','H2'],
+'South bridge':['Chip van de chipset die de processor verbindt met de tragere onderdelen (USB, SATA, toetsenbord, geluid, netwerk). Intel: ICH.','H2'],
+'MCH':['Memory Controller Hub: de north bridge bij Intel.','H2'],
+'GMCH':['Graphics and Memory Controller Hub: north bridge met ingebouwde grafische chip.','H2'],
+'ICH':['I/O Controller Hub: de south bridge bij Intel.','H2'],
+'FSB':['Front Side Bus: de verbinding tussen processor en north bridge.','H2'],
+'Interlink Dedicated Bus':['De verbinding tussen north bridge en south bridge.','H2'],
+'DMA':['Direct Memory Access: een randapparaat zet gegevens rechtstreeks in het RAM, zonder de processor.','H2'],
+'DMA-controller':['Deel van de chipset dat bij DMA de gegevens verplaatst.','H2'],
+'Interrupt (IRQ)':['Interrupt ReQuest: een randapparaat vraagt via de chipset aandacht van de processor.','H2'],
+'On board video':['Grafische chip die al in chipset of processor zit. Goedkoop en zuinig.','H2'],
+'Aparte grafische kaart':['Extra kaart in een uitbreidingssleuf, krachtiger dan on board video.','H2'],
+'Processorvoet':['Socket: de houder op het moederbord waar de processor in past. Moet exact passen.','H3'],
+'Merk':['Intel of AMD. Het moederbord moet bij het merk passen.','H3'],
+'Processorkernen':['Cores: rekeneenheden in de processor, zoals koks. Meer kernen = meer taken tegelijk.','H3'],
+'Kloksnelheid':['In GHz: aantal tikken per seconde. 3 GHz = 3 miljard tikken per seconde.','H3'],
+'Energieverbruik':['In watt. Meer watt = meer warmte = betere koeler nodig.','H3'],
+'Cachegeheugen':['Klein, supersnel geheugen in de processor: het kruidenrekje naast het fornuis.','H3'],
+'Wet van Moore':['Het aantal transistors op een chip verdubbelt ongeveer elke 2 jaar (Gordon Moore, 1965).','H3'],
+'Transistor':['Piepklein schakelaartje op een chip.','H3'],
+'Heatsink':['Koellichaam: metalen blok met vinnen dat warmte opneemt en afgeeft aan de lucht.','H4'],
+'Heatpipes':['Koperen buisjes die warmte snel van de processor naar de vinnen brengen.','H4'],
+'Ventilator':['Blaast lucht door de vinnen en neemt de warmte mee.','H4'],
+'Top-flow koeler':['Luchtkoeler met de ventilator plat bovenop, blaast naar beneden. Laag en compact.','H4'],
+'Tower koeler':['Hoge luchtkoeler, ventilator aan de zijkant, blaast naar de achterkant. Koelt beter, maar is groot.','H4'],
+'Water- en oliekoeling':['Een pomp stuurt vloeistof langs de processor. Populair bij casemodding.','H4'],
+'Casemodding':['Je pc-kast ombouwen en versieren (lichtjes, doorzichtige zijkant).','H4'],
+'Peltier-koeling (TEC)':['Thermo Electric Cooler: plaatje dat met stroom aan één kant koud en aan de andere kant warm wordt.','H4'],
+'Phase changer':['Koeling die werkt als een koelkast. Volgens de cursus enkel voor supercomputers.','H4'],
+'Cascade':['Een serie phase changers achter elkaar.','H4'],
+'Vloeibare stikstof':['Extreme koeling (ongeveer −196 °C). De stikstof wordt verbruikt tijdens de koeling.','H4'],
+'Ventilator met koperen geleiding':['Laptopkoeling: een koperen buis brengt de warmte naar een kleine ventilator.','H4'],
+'Koelplateau':['Plaat met ventilator(s) die je onder een laptop legt.','H4'],
+'Temperatuurcontrole':['Met een programma (bv. HWMonitor) de temperatuur van processor en schijven bekijken.','H4'],
+'Geluidsniveau':['Hoe luid een koeler is, in decibel (dB). Lager = stiller.','H4'],
+'Compatibiliteit':['Of onderdelen bij elkaar passen, bv. koeler of processor op de processorvoet.','H4'],
+'Firmware':['Vaste instructies in het ROM van een apparaat, bv. het BIOS/UEFI.','H5'],
+'EEPROM':['Electrically Erasable Programmable ROM: elektrisch wisbaar en opnieuw programmeerbaar ROM.','H5'],
+'Flash ROM':['Flash-geheugen: snellere soort EEPROM die in blokken gewist wordt (zoals een USB-stick).','H5'],
+'Flashen':['Nieuwe firmware in het ROM schrijven.','H5'],
+'Schaduwen':['Shadowing: de inhoud van het trage ROM naar het snelle RAM kopiëren.','H5'],
+'BIOS/UEFI':['De firmware op het moederbord die de pc opstart. Staat in flash-ROM.','H5'],
+'Random Access':['Willekeurig: elke geheugencel is even snel bereikbaar, in eender welke volgorde.','H6'],
+'Refresh rate':['Hoe vaak geheugencellen opnieuw opgeladen (ververst) worden. Het Sleutelboek gebruikt het ook voor de snelheid van het geheugen.','H6'],
+'Condensator':['Minibatterijtje dat één geheugencel vormt; houdt zijn lading maar heel kort.','H6'],
+'Vluchtig':['Zonder stroom is de inhoud weg (zoals RAM).','H6'],
+'SD-RAM':['Oude geheugengeneratie: 1 gegeven per klokpuls. Verouderd.','H6'],
+'DDR':['Double Data Rate: 2 gegevens per klokpuls. Verouderd.','H6'],
+'DDR2':['Geheugengeneratie: 4 gegevens per klokpuls (volgens de cursus).','H6'],
+'DDR3':['Geheugengeneratie: 8 gegevens per klokpuls (volgens de cursus).','H6'],
+'DDR4':['Geheugengeneratie sinds 2014 (aanvulling).','H6'],
+'DDR5':['Geheugengeneratie sinds 2020 (aanvulling).','H6'],
+'Frequentie':['Het getal na DDR3- (bv. 1600): de (effectieve) snelheid in MHz.','H6'],
+'Overdrachtssnelheid':['Het getal na PC3- (bv. 12800) in MB/s = frequentie × 8.','H6'],
+'Adresbus':['Deel van de systeembus waarop de processor het geheugenadres plaatst.','H6'],
+'Databus':['Deel van de systeembus waarop de gegevens naar de processor gaan.','H6'],
+'Geheugencontroller':['Bepaalt op welke geheugenchip een adres te vinden is.','H6'],
+'Array (rij)':['Een hele rij geheugencellen in een chip.','H6'],
+'Kolomadres':['Bepaalt welke geheugencel uit de rij gekozen wordt.','H6'],
+'Geheugencel':['Kleinste plaatsje in het geheugen dat één gegeven bewaart.','H6'],
+'Heatspreader':['Metalen plaatje op een geheugenlatje dat de warmte verspreidt.','H6'],
+'DIMM':['Lang geheugenlatje voor desktops.','H6'],
+'SO-DIMM':['Small Outline DIMM: kort geheugenlatje voor laptops.','H6'],
+'RIMM':['Rambus-geheugenmodule. Uitzondering: alle sleuven moeten gevuld zijn.','H6'],
+'CRIMM':['Continuity RIMM: leeg latje voor een lege Rambus-sleuf.','H6'],
+'Single channel':['Per klokpuls kan slechts één geheugenmodule worden aangesproken.','H6'],
+'Dual channel':['Twee modules tegelijk aangesproken. Beide zelfde type en capaciteit.','H6'],
+'Triple channel':['Drie modules tegelijk aangesproken.','H6'],
+'Quad channel':['Vier modules tegelijk aangesproken.','H6'],
+'ECC':['Error Correction Code: dubbele controle op fouten. Hogere betrouwbaarheid, voor servers.','H6'],
+'CAS-latency':['CL: aantal klokpulsen wachten voor de gegevens klaar zijn. Lager = sneller.','H6'],
+'Data access time':['Toegangstijd in nanoseconden (ns). Lager = sneller.','H6'],
+'Capaciteit':['Hoeveel het geheugen kan bevatten, in GB.','H6']
+};
+function gloss(opt){let best=null;const o=String(opt).toLowerCase();for(const k in G){const kl=k.toLowerCase();if(o===kl||o.startsWith(kl)||kl.startsWith(o)){if(!best||k.length>best.length)best=k;}}if(!best){for(const k in G){const kl=k.toLowerCase().replace(/ \(.*\)$/,'');if(kl.length>=3&&o.includes(kl)&&(!best||k.length>best.length))best=k;}}return best?G[best][0]:null;}
+
+/* ---------- vraagtypes ---------- */
+// mc: {type,prompt,options,answer,why,hint}; num: {type,prompt,answer,unit,why,hint,diag}; text: {..,answer,norm,diag}; order: {type,prompt,items,why,hint}
+function mc(prompt,answer,distractors,why,hint,n=2){return {type:'mc',prompt,answer,options:shuffle([answer,...pickN(distractors.filter(d=>d!==answer),n)]),why,hint};}
+function fromGloss(ch){const ks=Object.keys(G).filter(k=>G[k][1]===ch);const k=rnd(ks);const others=ks.filter(x=>x!==k&&G[x][0]!==G[k][0]);if(Math.random()<0.5)return mc(`Welk begrip hoort bij: "${G[k][0]}"`,k,others,`${k}: ${G[k][0]}`,'Zoek het sleutelwoord in de omschrijving.');return mc(`Wat betekent: ${k}?`,G[k][0],others.map(x=>G[x][0]),`${k}: ${G[k][0]}`,'Denk aan de vergelijking uit de les.');}
+function fromFacts(facts){const f=rnd(facts);return mc(f.q,f.a,f.d,f.w,f.h,f.n||2);}
+
+/* H1 onderdelen */
+const PARTS=[
+ {t:'Processor (CPU)',d:'voert alle berekeningen uit',v:'de chef-kok'},
+ {t:'Werkgeheugen (RAM)',d:'houdt bij waar je nu mee bezig bent en is leeg zonder stroom',v:'het werkblad'},
+ {t:'Opslag (SSD/HDD)',d:'bewaart je bestanden blijvend, ook zonder stroom',v:'de voorraadkast'},
+ {t:'ROM',d:'bevat vaste startinstructies die altijd blijven',v:'het vaste recept aan de muur'},
+ {t:'Moederbord',d:'is de grote printplaat die alle onderdelen verbindt',v:'het gebouw met gangen'},
+ {t:'Chipset',d:'regelt het verkeer tussen processor, geheugen en randapparaten',v:'de verkeersagent'},
+ {t:'Voeding (PSU)',d:'zet 230 V wisselspanning (AC) om in gelijkspanning (DC)',v:'de elektriciteitskast'},
+ {t:'Koeler',d:'voert de warmte van de processor af',v:'de dampkap'},
+ {t:'Grafische kaart (GPU)',d:'maakt het beeld voor je scherm'},
+ {t:'SATA-kabel',d:'verbindt de harde schijf of SSD met het moederbord voor data'},
+ {t:'Behuizing',d:'beschermt alle onderdelen tegen stof en stoten'}];
+const SIT1=[
+ ['Je typt een tekst, bewaart niet en de stroom valt uit. Waar stond je tekst?','Werkgeheugen (RAM)','RAM is vluchtig: zonder stroom is alles weg.'],
+ ['Waar staan je vakantiefoto\'s als de pc uit staat?','Opslag (SSD/HDD)','Opslag bewaart blijvend, ook zonder stroom.'],
+ ['Welk onderdeel krijgt de 230 V uit het stopcontact?','Voeding (PSU)','De voeding zet 230 V AC om in DC voor de rest.'],
+ ['Welke kabel brengt data van de harde schijf naar het moederbord?','SATA-kabel','Een SATA-kabel is de dataverbinding naar harde schijf, SSD of dvd-station.'],
+ ['Waar steekt de processor in?','Moederbord','Alles wordt op het moederbord aangesloten, ook de processor.'],
+ ['Wat heb je extra nodig voor zware 3D-games?','Grafische kaart (GPU)','Een aparte grafische kaart maakt zware beelden.'],
+ ['Welk onderdeel draait de programma\'s en rekent alles uit?','Processor (CPU)','De processor is de chef-kok: hij voert alle berekeningen uit.'],
+ ['Welk onderdeel voorkomt dat de processor oververhit raakt?','Koeler','De koeler voert de warmte af.']];
+function genE1(){const k=ri(0,3);const others=PARTS.map(p=>p.t);
+ if(k===0){const p=rnd(PARTS);return mc(`Welk onderdeel ${p.d}?`,p.t,others,`${p.t}: dit onderdeel ${p.d}.`,'Denk aan het restaurant: chef-kok, werkblad, voorraadkast, …');}
+ if(k===1){const p=rnd(PARTS.filter(p=>p.v));return mc(`In het restaurant-voorbeeld: welk onderdeel is ${p.v}?`,p.t,others,`${p.t} = ${p.v}: het ${p.d}.`,'Chef-kok = rekenen, werkblad = nu bezig, voorraadkast = bewaren.');}
+ if(k===2){const p=rnd(PARTS);const ds=PARTS.filter(x=>x!==p).map(x=>'Het '+x.d);return mc(`Wat doet dit onderdeel: ${p.t}?`,'Het '+p.d,ds,`${p.t}: ${p.d}.`,'Lees de naam goed; wat is zijn taak in één zin?');}
+ const s=rnd(SIT1);return mc(s[0],s[1],others,s[2],'Stel je de situatie voor in het restaurant.');}
+
+/* H2 chipset */
+const CTRL=[['de klokgenerator','System controller'],['de interrupts','System controller'],['DMA','System controller'],['het energiebeheer','System controller'],['de uitbreidingskaarten','Peripheral controller'],['de harde schijf en optische stations','Peripheral controller'],['het toetsenbord','Peripheral controller'],['de I/O controller voor randapparaten','Peripheral controller'],['de besturing van het werkgeheugen','Memory controller']];
+const BRIDGE=[['het werkgeheugen (RAM)','North bridge'],['de grafische kaart','North bridge'],['de USB-poorten','South bridge'],['de SATA-aansluiting van de harde schijf','South bridge'],['het toetsenbord','South bridge'],['de geluidskaart','South bridge'],['de netwerkaansluiting','South bridge']];
+const F2=[
+ {q:'Wat is MCH?',a:'De north bridge (Memory Controller Hub)',d:['De south bridge (I/O Controller Hub)','De bus tussen processor en north bridge','Een soort processorkoeler'],w:'MCH = Memory Controller Hub = de north bridge bij Intel.',h:'Memory = geheugen = snel = north.'},
+ {q:'Wat is ICH?',a:'De south bridge (I/O Controller Hub)',d:['De north bridge (Memory Controller Hub)','De bus tussen processor en north bridge','Een geheugenmodule'],w:'ICH = I/O Controller Hub = de south bridge bij Intel.',h:'I/O = in- en uitvoer = randapparaten = south.'},
+ {q:'Wat is het verschil tussen MCH en GMCH?',a:'Bij GMCH zit er een grafische chip in',d:['GMCH is de south bridge','GMCH is sneller geheugen','Er is geen verschil'],w:'GMCH = Graphics and Memory Controller Hub: north bridge met ingebouwde grafische chip (on board video).',h:'Waar staat de G voor?'},
+ {q:'Welke verbinding loopt tussen north bridge en south bridge?',a:'Interlink Dedicated Bus',d:['FSB','SATA-kabel','Adresbus'],w:'North en south bridge zijn verbonden via de Interlink Dedicated Bus.',h:'Het is de "binnenweg" tussen de twee chips.'},
+ {q:'Welke verbinding loopt tussen processor en north bridge?',a:'FSB (Front Side Bus)',d:['Interlink Dedicated Bus','SATA-kabel','Databus van het RAM'],w:'De FSB (Front Side Bus) verbindt de processor met de north bridge.',h:'Front = vooraan, bij de processor.'},
+ {q:'Wat bepaalt de chipset NIET?',a:'De kleur van de behuizing',d:['Het type processor','Het type werkgeheugen','Het aantal uitbreidingssleuven','De snelheid van de systeembus'],w:'De chipset bepaalt o.a. type processor, type en capaciteit werkgeheugen, snelheid systeembus, uitbreidingssleuven, energiebeheer en temperatuurcontrole CPU. Niet de kast.',h:'Welke hoort niet bij elektronica op het moederbord?'},
+ {q:'Wat bepaalt de chipset?',a:'Het type en de capaciteit van het werkgeheugen',d:['Het merk van je toetsenbord','De grootte van je scherm','De kleur van de ventilator'],w:'De chipset bepaalt welk type werkgeheugen en hoeveel.',h:'Denk: wat regelt de Memory controller?'},
+ {q:'Een leerling gebruikt enkel Word, YouTube en e-mail. Wat volstaat?',a:'On board video',d:['Een aparte grafische kaart','Een tweede processor'],w:'On board video is goedkoop en zuinig en volstaat voor gewoon gebruik.',h:'Heeft ze zware 3D-games nodig?'},
+ {q:'Een gamer wil zware 3D-games spelen. Wat heeft hij nodig?',a:'Een aparte grafische kaart',d:['On board video','Meer ROM'],w:'Voor zware games heb je een krachtige aparte grafische kaart in een uitbreidingssleuf nodig.',h:'On board video is zuinig maar niet krachtig.'},
+ {q:'Met welk beeld vergelijken we de chipset?',a:'Een verkeersagent',d:['Een chef-kok','Een voorraadkast','Een dampkap'],w:'De chipset regelt het verkeer tussen de onderdelen, zoals een verkeersagent.',h:'Wie regelt het verkeer op een kruispunt?'}];
+function genE2(){const k=ri(0,2);
+ if(k===0){const c=rnd(CTRL);return mc(`Welke controller van de chipset regelt ${c[0]}?`,c[1],['System controller','Peripheral controller','Memory controller'],`${c[1]}: ${G[c[1]][0].replace('Functie van de chipset: ','')}`,'System = klok en regels, Peripheral = alles rondom, Memory = geheugen.');}
+ if(k===1){const b=rnd(BRIDGE);return mc(`Via welke chip is ${b[0]} verbonden met de processor?`,b[1],['North bridge','South bridge','Interlink Dedicated Bus'],b[1]==='North bridge'?'De north bridge verbindt de processor met de snellere onderdelen: RAM en grafische kaart.':'De south bridge verbindt de processor met de tragere onderdelen: USB, SATA, toetsenbord, geluid, netwerk.','North = snel (RAM, grafische kaart), South = traag. De Interlink Dedicated Bus is een verbinding, geen chip.',2);}
+ return Math.random()<0.35?fromGloss('H2'):fromFacts(F2);}
+
+/* H2 DMA / IRQ */
+const DMAS=['Je kopieert een film van je USB-stick naar het geheugen en surft ondertussen verder.','De harde schijf laadt een groot spel rechtstreeks in het RAM.','De netwerkkaart zet een gedownload bestand rechtstreeks in het werkgeheugen.','De geluidskaart haalt een muziekbestand rechtstreeks uit het RAM, zonder hulp van de processor.','Een SSD zet 2 GB aan foto\'s in het RAM terwijl de processor een video afspeelt.'];
+const IRQS=['Je drukt op de toets "a" en de processor moet reageren.','Je klikt met de muis.','De printer meldt dat het papier op is.','De DMA-controller meldt aan de processor dat de kopie klaar is.','De netwerkkaart meldt: "Er is een pakketje binnen!"','Je steekt een USB-stick in en Windows reageert meteen.'];
+const F3=[
+ {q:'Waar staat DMA voor?',a:'Direct Memory Access',d:['Digital Memory Adapter','Double Memory Access','Direct Motherboard Access'],w:'DMA = Direct Memory Access: rechtstreekse toegang tot het geheugen.',h:'Direct … Memory …'},
+ {q:'Waar staat IRQ voor?',a:'Interrupt ReQuest',d:['Internal RAM Queue','Input Read Quick','Interrupt Return Quality'],w:'IRQ = Interrupt ReQuest: een verzoek om de processor te onderbreken.',h:'Interrupt = onderbreking, Request = verzoek.'},
+ {q:'Wie stuurt een IRQ?',a:'Het randapparaat',d:['De processor','Het RAM','Het ROM'],w:'Een randapparaat (toetsenbord, muis, printer …) vraagt via de chipset aandacht van de processor.',h:'Wie steekt zijn hand op in de klas?'},
+ {q:'Wie verplaatst bij DMA de gegevens naar het RAM?',a:'De DMA-controller in de chipset',d:['De processor','De voeding','Het ROM'],w:'Bij DMA doet de DMA-controller het werk; de processor kan iets anders doen.',h:'Het hele punt van DMA: de processor hoeft niet te dragen.'},
+ {q:'Bij welke controller van de chipset horen DMA en interrupts?',a:'System controller',d:['Peripheral controller','Memory controller'],w:'De System controller regelt klokgenerator, interrupts, DMA en energiebeheer.',h:'Ze gaan over randapparaten, maar horen toch bij "de regels".'},
+ {q:'Wat doet de processor bij een interrupt?',a:'Hij onderbreekt even zijn werk, helpt het apparaat en gaat dan verder',d:['Hij schakelt de pc uit','Hij kopieert het ROM naar het RAM','Hij negeert het signaal'],w:'Interrupt = onderbreking: de CPU helpt het apparaat en gaat daarna verder waar hij was.',h:'De ober tikt op de bel: wat doet de chef?'},
+ {q:'Met welk beeld vergelijken we DMA?',a:'De leverancier zet de dozen rechtstreeks in de koelcel',d:['De ober tikt op de bel','De chef proeft elk gerecht','De dampkap zuigt de warmte weg'],w:'Bij DMA gaan de gegevens rechtstreeks naar het RAM, zonder dat de chef (CPU) moet dragen.',h:'Rechtstreeks naar de opslagplaats.'}];
+function genE3(){const k=ri(0,2);
+ if(k===0)return mc(`${rnd(DMAS)} Welke techniek gebruikt de pc hier?`,'DMA',['Interrupt (IRQ)','FSB (Front Side Bus)'],'Gegevens gaan rechtstreeks naar of uit het RAM zonder de processor: DMA (Direct Memory Access).','Worden er veel gegevens verplaatst, of vraagt een toestel alleen aandacht?',2);
+ if(k===1)return mc(`${rnd(IRQS)} Welke techniek gebruikt de pc hier?`,'Interrupt (IRQ)',['DMA','FSB (Front Side Bus)'],'Een apparaat vraagt aandacht van de processor: een interrupt (IRQ).','Vraagt een toestel aandacht, of worden er veel gegevens verplaatst?',2);
+ return fromFacts(F3);}
+
+/* H3 processoren */
+const CPUS=[
+ {n:'AMD Ryzen 5 5600',s:'AM4',m:'AMD',c:6,g:3.5,w:65,l3:32},
+ {n:'AMD Ryzen 7 5800X',s:'AM4',m:'AMD',c:8,g:3.8,w:105,l3:32},
+ {n:'AMD Ryzen 5 7600',s:'AM5',m:'AMD',c:6,g:3.8,w:65,l3:32},
+ {n:'AMD Ryzen 7 7700',s:'AM5',m:'AMD',c:8,g:3.8,w:65,l3:32},
+ {n:'Intel Core i5-12400',s:'LGA1700',m:'Intel',c:6,g:2.5,w:65,l3:18},
+ {n:'Intel Core i7-13700',s:'LGA1700',m:'Intel',c:16,g:2.1,w:65,l3:30},
+ {n:'Intel Core i5-11400',s:'LGA1200',m:'Intel',c:6,g:2.6,w:65,l3:12},
+ {n:'Intel Core i3-10100',s:'LGA1200',m:'Intel',c:4,g:3.6,w:65,l3:6}];
+const cpuTxt=c=>`${c.n} (voet ${c.s}, ${c.c} kernen, ${String(c.g).replace('.',',')} GHz, ${c.w} W, ${c.l3} MB cache)`;
+const F4=[
+ {q:'Welke factor vergelijken we met het aantal koks in de keuken?',a:'Processorkernen',d:['Kloksnelheid','Cachegeheugen','Processorvoet'],w:'Elke kern (core) is een kok: meer kernen = meer taken tegelijk.',h:'Meer koks = meer gerechten tegelijk.'},
+ {q:'Welke factor vergelijken we met het kruidenrekje naast het fornuis?',a:'Cachegeheugen',d:['Processorkernen','Energieverbruik','Kloksnelheid'],w:'Cache = klein supersnel geheugen in de processor, altijd binnen handbereik.',h:'Klein en supersnel, vlak bij de kok.'},
+ {q:'Wat betekent een kloksnelheid van 3 GHz?',a:'3 miljard tikken per seconde',d:['3 miljoen tikken per seconde','3 kernen','3 GB geheugen'],w:'Giga = miljard, Hz = per seconde.',h:'Giga = miljard.'},
+ {q:'Wat controleer je EERST bij de aankoop van een processor voor je moederbord?',a:'Processorvoet',d:['Kloksnelheid','Cachegeheugen','Energieverbruik'],w:'Past hij niet in de socket, dan heb je niets aan de rest.',h:'Eerst moet hij passen.'},
+ {q:'Waarom verlaagt een laptopprocessor zijn kloksnelheid als je weinig doet?',a:'Om energie te besparen (kloksnelheid aangepast aan belasting)',d:['Omdat hij kapot is','Omdat het RAM vol is','Om het ROM te flashen'],w:'Laptops nemen energiebesparende maatregelen: de kloksnelheid wordt aangepast aan de belasting.',h:'Denk aan de batterij.'},
+ {q:'Welke twee merken maken bijna alle pc-processoren?',a:'Intel en AMD',d:['Kingston en Corsair','Coolblue en ALTERNATE','Microsoft en Google'],w:'Intel en AMD zijn de twee grote processormerken.',h:'Kijk naar het Sleutelboek: "Intel versus AMD".'},
+ {q:'Een processor verbruikt 105 W, een andere 65 W. Welke heeft de zwaarste koeler nodig?',a:'Die van 105 W',d:['Die van 65 W','Allebei evenveel'],w:'Meer watt = meer warmte = betere koeler.',h:'Stroom wordt warmte.'},
+ {q:'Wie stelde de wet van Moore op?',a:'Gordon Moore (1965)',d:['Bill Gates (1985)','Steve Jobs (2007)','Alan Turing (1936)'],w:'Gordon Moore, medeoprichter van Intel, in 1965.',h:'De wet draagt zijn naam.'},
+ {q:'Wat zegt de wet van Moore?',a:'Het aantal transistors op een chip verdubbelt ongeveer elke 2 jaar',d:['De kloksnelheid verdubbelt elk jaar','Het RAM halveert elke 2 jaar','Processoren worden elke 2 jaar 2 keer zo duur'],w:'Transistors verdubbelen ongeveer elke 2 jaar.',h:'Het gaat over transistors.'}];
+function genE4(){const k=ri(0,2);
+ if(k===0){const sock=rnd(['AM4','AM5','LGA1700','LGA1200']);const good=rnd(CPUS.filter(c=>c.s===sock));const bad=pickN(CPUS.filter(c=>c.s!==sock),2);
+  const q=mc(`Je moederbord heeft processorvoet ${sock}. Welke processor past?`,cpuTxt(good),bad.map(cpuTxt),`Alleen de ${good.n} heeft voet ${sock}. De processorvoet moet exact passen, de rest vergelijk je pas daarna.`,'Kijk eerst alleen naar de voet (socket).');return q;}
+ if(k===1){const three=pickN(CPUS,3);const f=rnd([['kernen','c','de meeste processorkernen'],['cache','l3','het meeste cachegeheugen'],['klok','g','de hoogste basiskloksnelheid']]);
+  const mx=Math.max(...three.map(c=>c[f[1]]));if(three.filter(c=>c[f[1]]===mx).length>1)return genE4();const best=three.find(c=>c[f[1]]===mx);
+  return {type:'mc',prompt:`Welke processor heeft ${f[2]}?<br><small>${three.map(c=>esc(cpuTxt(c))).join('<br>')}</small>`,answer:best.n,options:shuffle(three.map(c=>c.n)),why:`${best.n}: ${f[1]==='c'?best.c+' kernen':f[1]==='l3'?best.l3+' MB cache':String(best.g).replace('.',',')+' GHz'}.`,hint:'Zoek in de specificaties het juiste getal: kernen, GHz of MB cache.'};}
+ return fromFacts(F4);}
+
+/* H3 wet van Moore (getal) */
+function genE5(){const unit=rnd(['miljoen','miljard']);const n=rnd([1,2,3,4,5,6]);const y0=rnd([2000,2002,2004,2006,2008,2010,2012,2014,2016,2018,2020]);
+ if(Math.random()<0.2){const f=rnd([4,8,16]);const yrs=2*Math.log2(f);return {type:'num',prompt:`Volgens de wet van Moore: hoeveel jaar duurt het ongeveer tot het aantal transistors ${f} keer zo groot is?`,answer:yrs,unit:'jaar',why:`${f} = ${Array(Math.log2(f)).fill(2).join(' × ')}: dat is ${Math.log2(f)} keer verdubbelen. Elke verdubbeling = 2 jaar, dus ${yrs} jaar.`,distr:[Math.log2(f),f,2*f,yrs+2].filter(x=>x!==yrs),hint:'Hoeveel keer moet je verdubbelen om ×'+f+' te krijgen? Elke keer = 2 jaar.',diag:v=>v===Math.log2(f)?'Je telde het aantal keer verdubbelen, maar vergat × 2 jaar.':null};}
+ const yrs=rnd([2,4,6,8,10]);const k=yrs/2;const ans=n*2**k;
+ return {type:'num',prompt:`Een chip heeft ${n} ${unit} transistors in ${y0}. Hoeveel ${unit} transistors verwacht je volgens de wet van Moore in ${y0+yrs}?`,answer:ans,unit:unit,why:`${y0+yrs} − ${y0} = ${yrs} jaar → ${yrs} ÷ 2 = ${k} keer verdubbelen → ${n}${Array(k).fill(0).map((_,i)=>' → '+n*2**(i+1)).join('')} = ${ans} ${unit}.`,distr:[n+n*k,n*2*k,n*2**(k-1),n*2**(k+1),n*2**yrs].filter(x=>x!==ans),hint:`Stap 1: hoeveel jaar? Stap 2: deel door 2. Stap 3: verdubbel zoveel keer, vertrekkend van ${n}.`,
+  diag:v=>{if(v===n+n*k)return 'Je telde er telkens '+n+' bij. Bij de wet van Moore verdubbel je: × 2, × 2, …';if(v===n*2**yrs)return 'Je verdubbelde elk jaar. Het is elke 2 jaar: deel het aantal jaren eerst door 2.';if(v===n*2*k)return 'Je deed × 2 × '+k+'. Je moet '+k+' keer na elkaar verdubbelen.';if(v===n*2**(k-1)||v===n*2**(k+1))return 'Je verdubbelde één keer te weinig of te veel. Tel opnieuw: '+yrs+' ÷ 2 = '+k+' keer.';return null;}};}
+
+/* H4 koeling */
+const F6=[
+ {q:'Hoe heet het metalen blok met vinnen van een processorkoeler?',a:'Heatsink',d:['Heatpipes','Heatspreader','Ventilator'],w:'De heatsink (koellichaam) neemt warmte op en geeft die af aan de lucht, zoals een radiator.',h:'Sink = de plaats waar de warmte naartoe "zinkt".'},
+ {q:'Welk deel brengt de warmte via koperen buisjes weg van de processor?',a:'Heatpipes',d:['Heatsink','Ventilator','Koelplateau'],w:'Heatpipes zijn koperen buisjes die warmte snel naar de vinnen brengen.',h:'Pipe = buis.'},
+ {q:'Je bouwt een pc in een heel kleine, lage kast. Welke luchtkoeler kies je?',a:'Top-flow koeler',d:['Tower koeler','Vloeibare stikstof'],w:'Een top-flow koeler is laag en compact; een tower is hoog.',h:'Welke is laag?'},
+ {q:'Welke luchtkoeler staat rechtop en blaast naar de achterkant van de kast?',a:'Tower koeler',d:['Top-flow koeler','Koelplateau'],w:'De tower koeler is een hoge toren van vinnen met de ventilator aan de zijkant.',h:'Tower = toren.'},
+ {q:'Welke koeling is populair bij casemodding?',a:'Water- en oliekoeling',d:['Phase changer','Vloeibare stikstof','Koelplateau'],w:'Water- en oliekoeling met gekleurde slangen is populair bij casemodding.',h:'Denk aan doorzichtige slangen in een versierde kast.'},
+ {q:'Welke koeling is een plaatje dat met stroom één kant koud en de andere kant warm maakt?',a:'Peltier-koeling (TEC)',d:['Phase changer','Heatsink','Water- en oliekoeling'],w:'Peltier-koeling = TEC, Thermo Electric Cooler.',h:'TEC: Thermo Electric …'},
+ {q:'Hoe heet een serie phase changers achter elkaar?',a:'Cascade',d:['Dual channel','Heatpipe','Koelplateau'],w:'Meerdere phase changers achter elkaar = cascade.',h:'Een cascade is ook een trapsgewijze waterval.'},
+ {q:'Welke koeling wordt verbruikt tijdens het koelen?',a:'Vloeibare stikstof',d:['Phase changer','Peltier-koeling (TEC)','Heatpipes'],w:'Vloeibare stikstof verdampt en moet steeds bijgevuld worden.',h:'Welke verdampt?'},
+ {q:'Welke koeling werkt als een koelkast?',a:'Phase changer',d:['Peltier-koeling (TEC)','Top-flow koeler','Koelplateau'],w:'Een phase changer werkt met een compressor, zoals een koelkast.',h:'Phase = toestand: vloeistof wordt gas.'},
+ {q:'Hoe wordt de processor in een laptop meestal gekoeld?',a:'Ventilator met koperen geleiding',d:['Tower koeler','Vloeibare stikstof','Phase changer'],w:'In een laptop brengt een koperen buis de warmte naar een kleine ventilator.',h:'Weinig plaats: klein en plat.'},
+ {q:'Wat leg je onder een laptop voor extra koeling?',a:'Koelplateau',d:['Heatspreader','Heatsink','Cascade'],w:'Een koelplateau is een plaat met ventilatoren onder de laptop.',h:'Plateau = plaat.'},
+ {q:'Met welk programma uit de cursus controleer je de temperatuur van de processor?',a:'HWMonitor (CPUID)',d:['Word','Paint','Windows Geheugendiagnose'],w:'Temperatuurcontrole: een programma zoals CPUID HWMonitor toont de temperaturen.',h:'Hardware Monitor.'},
+ {q:'Wat is de grootste vijand van een koelventilator?',a:'Stof',d:['Licht','Muziek','Wifi'],w:'Stof blokkeert de luchtstroom. Reinigen: pc uit, stekker eruit, stof wegblazen.',h:'Kijk naar de foto van het vuile moederbord.'},
+ {q:'Welke drie factoren noemt de cursus bij de aankoop van een koeler?',a:'Type, compatibiliteit met moederbord, geluidsniveau',d:['Kleur, merk, prijs','Kernen, kloksnelheid, cache','Capaciteit, CAS-latency, refresh rate'],w:'Type, compatibiliteit met het moederbord en geluidsniveau.',h:'Past hij, welk soort, hoe luid?'},
+ {q:'Koeler A: 25 dB, koeler B: 35 dB. Beide passen. Je wil een stille pc. Welke?',a:'Koeler A (25 dB)',d:['Koeler B (35 dB)','Maakt niet uit'],w:'Lager aantal decibel = stiller.',h:'dB = hoe luid.'}];
+const genE6=()=>Math.random()<0.3?fromGloss('H4'):fromFacts(F6);
+
+/* H5 ROM */
+const F7=[
+ {q:'Waar staat ROM voor?',a:'Read Only Memory',d:['Random Only Memory','Read Open Memory','Rapid Online Memory'],w:'ROM = Read Only Memory: geheugen dat je alleen leest.',h:'Read Only = alleen lezen.'},
+ {q:'Wat gebeurt er met de inhoud van het ROM als de stroom uitvalt?',a:'Ze blijft bewaard',d:['Ze is weg','Ze wordt naar de SSD gekopieerd'],w:'ROM houdt zijn inhoud zonder stroom; RAM niet.',h:'Het vaste recept aan de muur.'},
+ {q:'Waar staat de eerste E van EEPROM voor?',a:'Electrically',d:['Easy','External','Extra'],w:'EEPROM = Electrically Erasable Programmable ROM.',h:'Het gaat met elektriciteit.'},
+ {q:'Wat betekent EEPROM?',a:'Electrically Erasable Programmable ROM',d:['Extra Easy Programmable ROM','Electrically Erasable Permanent RAM','External Electric Programmable ROM'],w:'Elektrisch wisbaar en programmeerbaar ROM.',h:'Erasable = wisbaar.'},
+ {q:'Hoe heet het schrijven van nieuwe firmware in het ROM?',a:'Flashen',d:['Schaduwen','Refreshen','Formatteren'],w:'Flashen = nieuwe firmware in het (flash-)ROM schrijven.',h:'Flash ROM → …'},
+ {q:'Hoe heet het kopiëren van de inhoud van het ROM naar het RAM?',a:'Schaduwen',d:['Flashen','Refreshen','Dual channel'],w:'Schaduwen (shadowing): ROM is traag, RAM is snel.',h:'Het RAM wordt een "schaduw" van het ROM.'},
+ {q:'Waarom kopieert de pc de inhoud van het ROM naar het RAM?',a:'Omdat RAM sneller toegankelijk is',d:['Omdat ROM vol is','Om het ROM te wissen','Om stroom te besparen'],w:'ROM is traag toegankelijk, RAM snel. Daarom schaduwen.',h:'Het gaat om snelheid.'},
+ {q:'Welk soort ROM wordt in blokken gewist en gebruikt dezelfde techniek als een USB-stick?',a:'Flash ROM',d:['EEPROM','Werkgeheugen (RAM)','Cachegeheugen'],w:'Flash ROM (flash-geheugen) wordt per blok gewist.',h:'Zelfde naam als een "flash drive".'},
+ {q:'Wat staat er in het ROM?',a:'Firmware: vaste instructies',d:['Je vakantiefoto\'s','De programma\'s die nu open staan','Je browsergeschiedenis'],w:'ROM bewaart firmware, zoals het BIOS/UEFI.',h:'Vaste instructies voor het apparaat.'},
+ {q:'Welk apparaat heeft GEEN firmware in ROM nodig?',a:'Een gewone papieren kalender',d:['Een wasmachine','Een router','Een printer'],w:'Firmware zit in computeronderdelen en in allerlei elektronische apparaten. Een papieren kalender is niet elektronisch.',h:'Welke is niet elektronisch?'},
+ {q:'Welke volgorde toont de geschiedenis van ROM uit de cursus?',a:'Niet herprogrammeerbaar → moeilijk herprogrammeerbaar → flashen',d:['Flashen → moeilijk herprogrammeerbaar → niet herprogrammeerbaar','Schaduwen → flashen → refreshen'],w:'Van niet, naar moeilijk, naar gemakkelijk (flashen).',h:'Het werd steeds gemakkelijker.'},
+ {q:'Een toestel toont: "Update bezig, zet het toestel niet uit". Wat gebeurt er?',a:'De firmware wordt geflasht',d:['Het RAM wordt ververst','Het ROM wordt geschaduwd','De processor wordt gekoeld'],w:'Een firmware-update = flashen. Stroom uit tijdens flashen kan het toestel onbruikbaar maken.',h:'Nieuwe firmware in het ROM.'}];
+const genE7=()=>Math.random()<0.3?fromGloss('H5'):fromFacts(F7);
+
+/* H6 DDR omzetten */
+const DDRS=[['DDR','200'],['DDR','400'],['DDR2','400'],['DDR2','800'],['DDR3','800'],['DDR3','1600'],['DDR4','1600'],['DDR4','2400'],['DDR4','3200'],['DDR5','4800'],['DDR5','5600'],['DDR5','6400']];
+const pcName=(g,n)=>(g==='DDR'?'PC':'PC'+g.slice(3))+'-'+(n*8);
+const ddrName=(g,n)=>g+'-'+n;
+const normMem=s=>String(s).toUpperCase().replace(/\s|-|_/g,'');
+function genE8(){const [g,nS]=rnd(DDRS);const n=+nS;const pc=pcName(g,n);const dd=ddrName(g,n);
+ if(Math.random()<0.5){return {type:'text',prompt:`Zet om: <b>${dd}</b> = ?`,placeholder:'bv. PC3-12800',answer:pc,why:`${g} → ${pc.split('-')[0]} (zelfde generatie). ${fmt(n)} × 8 = ${fmt(n*8)} → ${pc}.`,distr:(()=>{const gn=g==='DDR'?'':g.slice(3);const other=g==='DDR5'?'4':String((+gn||1)+1);return [(g==='DDR'?'PC':'PC'+gn)+'-'+n*2,(g==='DDR'?'PC':'PC'+gn)+'-'+n,'PC'+other+'-'+n*8,(g==='DDR'?'PC':'PC'+gn)+'-'+n*4];})(),hint:'Generatie blijft gelijk (DDR3 → PC3). Het getal: × 8.',
+  diag:v=>{const x=normMem(v);const num=+((String(v).match(/(\d+)\s*$/)||[])[1]);const gen=g==='DDR'?'PC':'PC'+g.slice(3);
+   if(!x.startsWith('PC'))return 'Een PC-naam begint met "PC", gevolgd door de generatie en het getal, bv. PC3-12800.';
+   if(num===n*8&&x!==normMem(pc))return `Het getal ${fmt(n*8)} klopt, maar de generatie niet: ${g} wordt ${gen}.`;
+   if(num===n*2||String(x).endsWith(String(n*2)))return 'Je deed × 2 (double data rate). Voor de PC-naam doe je × 8 (8 bytes per overdracht).';
+   if(String(x).endsWith(String(n)))return 'Je nam het getal over. Vermenigvuldig met 8.';
+   if(String(x).endsWith(String(n/8)))return 'Je deelde door 8. Van DDR naar PC vermenigvuldig je met 8.';return null;}};}
+ return {type:'text',prompt:`Zet om: <b>${pc}</b> = ?`,placeholder:'bv. DDR3-1600',answer:dd,why:`${pc.split('-')[0]} → ${g} (zelfde generatie). ${fmt(n*8)} ÷ 8 = ${fmt(n)} → ${dd}.`,distr:(()=>{const other=g==='DDR5'?'DDR4':g==='DDR'?'DDR2':'DDR'+(+g.slice(3)+1);return [g+'-'+n*8,g+'-'+n/2,other+'-'+n,g+'-'+n*2];})(),hint:'Generatie blijft gelijk (PC3 → DDR3). Het getal: ÷ 8.',
+  diag:v=>{const x=normMem(v);if(!x.startsWith('DDR'))return 'Een geheugennaam begint met "DDR", gevolgd door de generatie en het getal, bv. DDR3-1600.';const num=+((String(v).match(/(\d+)\s*$/)||[])[1]);
+   if(num===n&&x!==normMem(dd))return `Het getal ${n} klopt, maar de generatie niet: ${pc.split('-')[0]} hoort bij ${g}.`;
+   if(num===n*64)return 'Je vermenigvuldigde met 8. Van PC naar DDR deel je door 8.';if(num===n*8)return 'Je nam het getal over. Deel door 8.';if(num===n*4)return 'Je deelde door 2. Deel door 8.';return null;}};}
+
+function toMC(q){if(q.type!=='num'&&q.type!=='text')return q;const u=q.unit?' '+q.unit:'';const A=String(q.answer)+u;const ds=[...new Set((q.distr||[]).map(x=>String(x)+u))].filter(x=>x!==A);
+ return {type:'mc',prompt:q.prompt,answer:A,options:shuffle([A,...pickN(ds,3)]),why:q.why,hint:q.hint};}
+/* H6 werking in volgorde */
+const STEPS=['De processor plaatst het geheugenadres op de adresbus.','De geheugencontroller bepaalt op welke geheugenchip het adres staat.','Van die chip wordt de hele rij (array) ingelezen.','Uit de array wordt de juiste geheugencel gekozen met het kolomadres.','De gegevens gaan via de databus naar de processor.'];
+const SHORT=['adresbus','geheugencontroller','rij (array)','kolomadres','databus'];
+function genE9(){if(Math.random()<0.6)return {type:'order',prompt:'Zet de werking van RAM in de juiste volgorde. Klik de stappen aan in volgorde.',items:STEPS,why:'Adres → controller → rij → kolom → data. Ezelsbrug: Alle Cinema\'s Reserveren Kaartjes Direct.',hint:'Het begint bij de processor en eindigt bij de processor. Eerst de hele rij, dan pas de kolom.'};
+ const i=ri(0,3);const k=rnd([0,1]);
+ if(k===0)return mc(`Welke stap komt direct NA: "${STEPS[i]}"`,STEPS[i+1],STEPS.filter((_,j)=>j!==i+1&&j!==i),`Volgorde: ${SHORT.join(' → ')}.`,'Adres → controller → rij → kolom → data.');
+ const j=i+1;return mc(`Welke stap komt direct VOOR: "${STEPS[j]}"`,STEPS[i],STEPS.filter((_,x)=>x!==i&&x!==j),`Volgorde: ${SHORT.join(' → ')}.`,'Adres → controller → rij → kolom → data.');}
+
+/* H6 modules en kenmerken */
+const F10=[
+ {q:'Wat betekent "Random" in Random Access Memory?',a:'Willekeurig: elke geheugencel is even snel bereikbaar',d:['Toevallig: het geheugen maakt fouten','Tijdelijk: het geheugen wordt vaak gewist','Rij per rij: je leest van voor naar achter'],w:'Random = willekeurig: in eender welke volgorde even snel.',h:'Denk aan de kast met genummerde laatjes.'},
+ {q:'Waarom moet RAM steeds ververst worden (refresh)?',a:'Condensatoren behouden stroom slechts erg kort',d:['Het RAM wordt te warm','Het ROM wist het RAM','De processor vraagt het'],w:'Elke cel is een condensator die zijn lading snel verliest.',h:'De lekke fietsband.'},
+ {q:'Welke geheugenlatjes horen in een laptop?',a:'SO-DIMM',d:['DIMM','RIMM','CRIMM'],w:'SO-DIMM = Small Outline DIMM: kort, voor laptops.',h:'Small Outline = klein.'},
+ {q:'Welke geheugenlatjes horen in een desktop?',a:'DIMM',d:['SO-DIMM','CRIMM'],w:'DIMM is het lange latje voor desktops.',h:'Het lange latje.'},
+ {q:'Hoe heet het metalen plaatje op een geheugenlatje dat warmte verspreidt?',a:'Heatspreader',d:['Heatsink','Heatpipes','CRIMM'],w:'Heatspreader = warmteverspreider op het latje.',h:'Spread = verspreiden.'},
+ {q:'Bij welk geheugen moeten ALLE sleuven gevuld zijn (lege sleuf = CRIMM)?',a:'RIMM (Rambus)',d:['DIMM','SO-DIMM','ECC'],w:'Uitzondering uit de cursus: Rambus-geheugen (RIMM). Lege sleuf krijgt een CRIMM.',h:'De uitzondering: Rambus.'},
+ {q:'Twee modules worden tegelijk aangesproken. Hoe heet dat?',a:'Dual channel',d:['Single channel','Triple channel','Quad channel'],w:'Dual = twee.',h:'Dual = twee.'},
+ {q:'Drie modules worden tegelijk aangesproken. Hoe heet dat?',a:'Triple channel',d:['Dual channel','Quad channel','Single channel'],w:'Triple = drie.',h:'Triple = drie.'},
+ {q:'Vier modules worden tegelijk aangesproken. Hoe heet dat?',a:'Quad channel',d:['Dual channel','Triple channel','Single channel'],w:'Quad = vier.',h:'Quad = vier.'},
+ {q:'Per klokpuls kan slechts één module worden aangesproken. Hoe heet dat?',a:'Single channel',d:['Dual channel','ECC','Quad channel'],w:'Single = één.',h:'Single = één.'},
+ {q:'Wat is efficiënter?',a:'2 × 2 GB',d:['1 × 4 GB','Maakt niet uit'],w:'2 × 2 GB kan in dual channel werken: twee modules tegelijk.',h:'Twee kassa\'s of één?'},
+ {q:'Wat is de voorwaarde voor dual channel?',a:'Beide modules zelfde type en capaciteit',d:['Eén module DIMM en één SO-DIMM','Modules van verschillende generaties','Alle sleuven leeg laten'],w:'Voor dual channel: zelfde type en capaciteit.',h:'Een tweeling.'},
+ {q:'Welk geheugen doet een dubbele controle op fouten, voor servers?',a:'ECC',d:['SO-DIMM','CRIMM','SD-RAM'],w:'ECC = Error Correction Code.',h:'Error Correction …'},
+ {q:'Wat betekent een lagere CAS-latency?',a:'Minder klokpulsen wachten: sneller',d:['Meer capaciteit','Trager geheugen','Meer warmte'],w:'CAS-latency = wachttijd in klokpulsen; lager = sneller.',h:'Latency = vertraging.'},
+ {q:'Wat is data access time?',a:'De toegangstijd in nanoseconden: lager is sneller',d:['Hoeveel GB het geheugen heeft','Hoe vaak het geheugen ververst wordt','De spanning van het geheugen'],w:'Data access time = hoe lang het duurt om iets te vinden.',h:'Access = toegang.'},
+ {q:'Hoeveel gegevens per klokpuls haalt DDR2 volgens de cursus?',a:'4',d:['1','2','8'],w:'SD-RAM 1, DDR 2, DDR2 4, DDR3 8.',h:'Het verdubbelt per generatie.'},
+ {q:'Hoeveel gegevens per klokpuls haalt DDR3 volgens de cursus?',a:'8',d:['2','4','16'],w:'SD-RAM 1, DDR 2, DDR2 4, DDR3 8.',h:'Het verdubbelt per generatie.'},
+ {q:'Welke geheugengeneratie haalt 1 gegeven per klokpuls?',a:'SD-RAM',d:['DDR','DDR2','DDR3'],w:'SD-RAM: 1 gegeven per klokpuls (verouderd).',h:'De oudste.'},
+ {q:'Waar staat DDR voor?',a:'Double Data Rate',d:['Dual Data RAM','Direct Data Read','Double Dynamic ROM'],w:'DDR = Double Data Rate.',h:'Double = dubbel.'},
+ {q:'Past een DDR4-latje in een sleuf voor DDR3?',a:'Nee, de inkeping zit op een andere plaats',d:['Ja, als je hard duwt','Ja, maar trager'],w:'Elke generatie heeft de inkeping op een andere plaats.',h:'Kijk naar het gleufje onderaan.'},
+ {q:'Welke informatie staat op de sticker van een geheugenmodule?',a:'Capaciteit, generatie, CAS-latency, typenummer',d:['Processorvoet en kloksnelheid','Temperatuur en geluidsniveau','BIOS-versie'],w:'Sticker: capaciteit, aantal chips, typenummer, generatie, refresh rate, geheugentype, CAS-latency.',h:'Alles over het geheugen zelf.'},
+ {q:'Wat is RAM zonder stroom?',a:'Leeg (vluchtig)',d:['Vol','Onveranderd'],w:'RAM is vluchtig: de condensatoren verliezen hun lading.',h:'Het werkblad bij sluitingstijd.'},
+ {q:'Waaraan wordt de frequentie van het RAM aangepast volgens de cursus?',a:'Aan de FSB',d:['Aan de voeding','Aan de koeler','Aan het ROM'],w:'Frequentie aangepast aan FSB (Front Side Bus).',h:'De bus tussen processor en chipset.'}];
+const genE10=()=>Math.random()<0.25?fromGloss('H6'):fromFacts(F10);
+
+/* Praktijk: waar zit het probleem? */
+const F11=[
+ {q:'Karim koopt een AMD-processor voor voet AM5, maar zijn moederbord heeft voet LGA1700. Waar zit het probleem?',a:'De processorvoet (en het merk) past niet',d:['Het RAM is te klein','De koeler is te luid','Het ROM moet geflasht worden'],w:'LGA1700 is een Intel-voet. De processorvoet moet exact passen.',h:'Wat controleer je eerst bij een processor?'},
+ {q:'De pc van Emma valt uit tijdens het gamen. De ventilator zit vol grijze pluizen. Waar zit het probleem?',a:'Stof: de koeling werkt niet goed',d:['Het RAM is vluchtig','De SATA-kabel is los','Het ROM is leeg'],w:'Stof blokkeert de luchtstroom, de processor wordt te heet. Oplossing: pc uit, stekker eruit, stof wegblazen.',h:'Grijze pluizen …'},
+ {q:'Lars gamet met zijn laptop op zijn dekbed. De laptop wordt heet en de game hapert. Waar zit het probleem?',a:'De luchtgaten zijn afgesloten',d:['De processorvoet past niet','Het ROM wordt geflasht','Er is geen dual channel'],w:'Op een dekbed krijgt de ventilator met koperen geleiding geen lucht. Oplossing: harde ondergrond of koelplateau.',h:'Waar haalt de laptopventilator zijn lucht?'},
+ {q:'Een DDR4-latje past niet in de sleuf van een oud moederbord. Waar zit het probleem?',a:'Het moederbord gebruikt een andere geheugengeneratie',d:['Het latje is te warm','De voeding is te zwak','Het BIOS is te nieuw'],w:'Elke generatie heeft de inkeping op een andere plaats; het moederbord (chipset) bepaalt het type werkgeheugen.',h:'Kijk naar de inkeping.'},
+ {q:'Nora wil een geheugenlatje uit een desktop in haar laptop steken. Het past niet. Waarom?',a:'Een laptop gebruikt SO-DIMM, een desktop DIMM',d:['De laptop heeft geen chipset','Het latje heeft geen heatspreader','Laptops gebruiken geen RAM'],w:'DIMM = lang (desktop), SO-DIMM = kort (laptop).',h:'Small Outline …'},
+ {q:'Tijdens een BIOS-update valt de stroom uit. Nu start de pc niet meer. Waar zit het probleem?',a:'Het flashen van het ROM werd onderbroken',d:['Het RAM is vol','De heatpipes zijn kapot','Er zit stof in de ventilator'],w:'Een BIOS-update = flashen. Onderbroken = halve firmware in het ROM.',h:'Wat gebeurt er bij een BIOS-update?'},
+ {q:'Sam typt een verslag, bewaart niet, en de stroom valt uit. De tekst is weg. Waarom?',a:'De tekst stond enkel in het vluchtige RAM',d:['Het ROM is gewist','De SSD is kapot','De chipset is oververhit'],w:'RAM is vluchtig. Pas als je opslaat, gaat de tekst naar de SSD.',h:'Waar staat wat je NU doet?'},
+ {q:'Een pc heeft 1 latje van 8 GB en 1 latje van 4 GB. Dual channel werkt niet goed. Waarom?',a:'De modules hebben niet dezelfde capaciteit',d:['Er zijn te veel latjes','Het zijn SO-DIMM\'s','De processor is te snel'],w:'Voor dual channel: beide modules zelfde type en capaciteit.',h:'Wat is de voorwaarde voor dual channel?'},
+ {q:'Met 30 tabbladen open hapert de pc. Taakbeheer: geheugen 98 % in gebruik. Waar zit het probleem?',a:'Te weinig werkgeheugen (capaciteit)',d:['Te weinig ROM','De voeding is te sterk','De processorvoet past niet'],w:'Het werkblad (RAM) is vol. Oplossing: tabbladen sluiten of meer RAM (capaciteit).',h:'Welk getal staat op 98 %?'},
+ {q:'Een nieuwe tower koeler past niet: het zijpaneel van de kleine kast gaat niet meer dicht. Waar zit het probleem?',a:'Verkeerd type koeler: te hoog voor de kast',d:['Te veel cachegeheugen','Verkeerde geheugengeneratie','Te weinig interrupts'],w:'Tower koelers zijn hoog. In een kleine kast kies je een top-flow koeler.',h:'Top-flow of tower?'},
+ {q:'De bevestiging van een nieuwe koeler past niet rond de processor. Waar zit het probleem?',a:'De koeler is niet compatibel met het moederbord',d:['Het geluidsniveau is te hoog','Het RAM is vluchtig','De SATA-kabel is los'],w:'Compatibiliteit met het moederbord (processorvoet) is een aankoopfactor.',h:'Een van de drie aankoopfactoren.'},
+ {q:'Windows ziet de harde schijf niet meer. Aan de schijf hangt een losse rode platte kabel. Waar zit het probleem?',a:'De SATA-kabel is los',d:['De processor is te traag','Het ROM moet geschaduwd worden','Het RAM heeft geen ECC'],w:'De SATA-kabel is de dataverbinding tussen moederbord en harde schijf.',h:'Rode platte kabel met L-stekker.'},
+ {q:'Je drukt op de aan-knop: geen lampje, geen ventilator, niets. Wat controleer je eerst?',a:'De voeding en de stekker',d:['De CAS-latency','De wet van Moore','Het cachegeheugen'],w:'Zonder stroom doet niets iets. De voeding levert de stroom aan alle onderdelen.',h:'Begin bij de stroom.'},
+ {q:'Een nieuwe game schokt op een laptop met enkel on board video. Waar zit het probleem?',a:'Er is geen aparte grafische kaart',d:['Het ROM is te groot','De heatspreader ontbreekt','De FSB is te snel'],w:'On board video is zuinig, maar niet krachtig genoeg voor zware games.',h:'Wat maakt het beeld?'},
+ {q:'Een webshop-server crasht af en toe door geheugenfouten. Wat ontbreekt?',a:'ECC-geheugen',d:['Een koelplateau','Een SO-DIMM','On board video'],w:'ECC doet een dubbele controle op fouten: hogere betrouwbaarheid voor servers.',h:'Error Correction …'},
+ {q:'Een laptop op batterij draait altijd op maximale snelheid, ook als je niets doet. De batterij is snel leeg. Wat werkt niet?',a:'Kloksnelheid aangepast aan belasting',d:['Dual channel','Schaduwen','DMA'],w:'Laptops besparen energie door de kloksnelheid aan te passen aan de belasting.',h:'De fietser die altijd hard trapt.'},
+ {q:'Een nieuwe processor van 125 W wordt snel te heet met de oude kleine koeler van een processor van 35 W. Waar zit het probleem?',a:'De koeler is te zwak voor het energieverbruik',d:['De processorvoet is te groot','Het RAM is te snel','Er is geen interrupt'],w:'Meer watt = meer warmte = betere koeler nodig.',h:'Energieverbruik ↔ warmte.'}];
+const genE11=()=>fromFacts(F11);
+
+/* ---------- oefeningen ---------- */
+const EX=[
+ {id:'E1',ch:'H1',title:'Onderdelen herkennen',gen:genE1,
+  uitleg:'Elk onderdeel heeft één taak. Denk aan het restaurant: de processor is de chef-kok, het RAM het werkblad, de opslag de voorraadkast, het ROM het vaste recept aan de muur, het moederbord het gebouw, de chipset de verkeersagent, de voeding de elektriciteitskast en de koeler de dampkap.',
+  plan:['Lees wat het onderdeel doet (of de situatie).','Zoek het beeld in het restaurant.','Kies het onderdeel met die taak.'],
+  vb:['Vraag: "Welk onderdeel bewaart je bestanden ook zonder stroom?"','Stap 1 · Het gaat over bewaren, ook als de stroom weg is.','Stap 2 · In het restaurant: wat blijft liggen als het restaurant sluit? De voorraadkast.','Stap 3 · De voorraadkast = de opslag (SSD/HDD). Niet het RAM: dat is het werkblad en wordt leeggemaakt.']},
+ {id:'E2',ch:'H2',title:'De chipset: controllers en bridges',gen:genE2,
+  uitleg:'De chipset heeft drie functies: System controller (klokgenerator, interrupts, DMA, energiebeheer), Peripheral controller (uitbreidingskaarten, HDD/optische stations, toetsenbord, I/O controller randapparaten) en Memory controller (werkgeheugen). De north bridge (MCH/GMCH) verbindt de processor met de snellere onderdelen, de south bridge (ICH) met de tragere.',
+  plan:['Gaat het over een taak? Kies System, Peripheral of Memory controller.','Gaat het over een verbinding? Snel onderdeel (RAM, grafische kaart) = north bridge; traag (USB, SATA, toetsenbord, geluid, netwerk) = south bridge.','Afkorting? MCH = north, ICH = south, G = met grafische chip.'],
+  vb:['Vraag: "Via welke chip zijn de USB-poorten verbonden met de processor?"','Stap 1 · Het gaat over een verbinding, dus north of south bridge.','Stap 2 · USB is een traag onderdeel.','Stap 3 · Traag = south bridge (ICH).']},
+ {id:'E3',ch:'H2',title:'DMA of interrupt?',gen:genE3,
+  uitleg:'DMA (Direct Memory Access): een randapparaat zet gegevens rechtstreeks in het RAM via de DMA-controller, zonder dat de processor ze moet dragen. Interrupt (IRQ, Interrupt ReQuest): een randapparaat vraagt via de chipset aandacht van de processor; die onderbreekt even zijn werk.',
+  plan:['Worden er (veel) gegevens verplaatst naar of uit het RAM? → DMA.','Vraagt een toestel alleen aandacht ("ik heb iets!")? → Interrupt.','Tip: een melding "klaar!" na een DMA-kopie is zelf een interrupt.'],
+  vb:['Vraag: "Je klikt met de muis. Welke techniek?"','Stap 1 · Worden er grote hoeveelheden gegevens naar het RAM gebracht? Nee.','Stap 2 · Vraagt de muis aandacht van de processor? Ja: "er is geklikt!".','Stap 3 · Dus: interrupt (IRQ).']},
+ {id:'E4',ch:'H3',title:'Processor kiezen',gen:genE4,
+  uitleg:'Zes factoren bij aankoop: processorvoet (socket), merk (Intel/AMD), aantal processorkernen, kloksnelheid (GHz), energieverbruik (W) en cachegeheugen (MB). Eerst moet hij passen (voet, merk), dan kijk je hoe goed hij is.',
+  plan:['Kijk eerst naar de processorvoet: past hij op het moederbord?','Controleer het merk (AM4/AM5 = AMD, LGA = Intel).','Vergelijk dan kernen, kloksnelheid en cache; kijk naar de watt voor de koeler.'],
+  vb:['Vraag: moederbord met voet AM4. Keuze: Ryzen 5 5600 (AM4) of Core i5-12400 (LGA1700).','Stap 1 · Voet: alleen de Ryzen 5 5600 heeft AM4.','Stap 2 · Merk: AM4 is AMD. Klopt.','Stap 3 · 6 kernen, 3,5 GHz, 32 MB cache, 65 W: prima. Antwoord: Ryzen 5 5600.']},
+ {id:'E5',ch:'H3',title:'Rekenen met de wet van Moore',gen:genE5,
+  uitleg:'Wet van Moore: het aantal transistors op een chip verdubbelt ongeveer elke 2 jaar.',
+  plan:['Hoeveel jaar zit ertussen? (eindjaar − beginjaar)','Deel door 2: zoveel keer verdubbelen.','Verdubbel zoveel keer: × 2, × 2, …'],
+  vb:['Vraag: 1 miljoen transistors in 2010. Hoeveel in 2016?','Stap 1 · 2016 − 2010 = 6 jaar.','Stap 2 · 6 ÷ 2 = 3 keer verdubbelen.','Stap 3 · 1 → 2 → 4 → 8. Antwoord: 8 miljoen.']},
+ {id:'E6',ch:'H4',title:'De juiste koeling',gen:genE6,
+  uitleg:'Een processorkoeler: heatsink (blok met vinnen), heatpipes (koperen buisjes), ventilator. Top-flow = laag, tower = hoog en beter. Voor gevorderden: water- en oliekoeling, Peltier (TEC), phase changer (cascade), vloeibare stikstof. Laptop: ventilator met koperen geleiding, koelplateau. Aankoop: type, compatibiliteit met moederbord, geluidsniveau.',
+  plan:['Welk probleem of welke situatie? (plaats, laptop, lawaai, extreem)','Welke koeling of welk onderdeel past daarbij?','Controleer: past het (compatibiliteit), en is het stil genoeg?'],
+  vb:['Vraag: "Kleine, lage kast: welke luchtkoeler?"','Stap 1 · Probleem: weinig hoogte.','Stap 2 · Tower = hoog, top-flow = laag.','Stap 3 · Antwoord: top-flow koeler.']},
+ {id:'E7',ch:'H5',title:'ROM, flashen en schaduwen',gen:genE7,
+  uitleg:'ROM = Read Only Memory: bevat firmware en houdt die zonder stroom. EEPROM = Electrically Erasable Programmable ROM. Flash ROM = snellere soort, per blok gewist. Flashen = nieuwe firmware schrijven. Schaduwen = inhoud van het trage ROM naar het snelle RAM kopiëren.',
+  plan:['Gaat het over bewaren zonder stroom of firmware? → ROM.','Nieuwe firmware schrijven? → flashen.','ROM naar RAM kopiëren voor snelheid? → schaduwen.'],
+  vb:['Vraag: "Waarom kopieert de pc het ROM naar het RAM?"','Stap 1 · Het gaat over kopiëren van ROM naar RAM: dat is schaduwen.','Stap 2 · ROM is traag toegankelijk, RAM snel.','Stap 3 · Antwoord: omdat RAM sneller toegankelijk is.']},
+ {id:'E8',ch:'H6',title:'DDR ↔ PC omzetten',gen:genE8,
+  uitleg:'Een latje heeft twee namen: DDR3-1600 (frequentie 1600 MHz) en PC3-12800 (overdrachtssnelheid 12 800 MB/s). Per overdracht gaan er 8 bytes (64 bits). Regel: PC-getal = DDR-getal × 8. De generatie blijft gelijk: DDR3 ↔ PC3. Bij de eerste generatie: DDR-400 = PC-3200.',
+  plan:['Generatie overnemen: DDR3 → PC3, DDR4 → PC4 (en omgekeerd).','Van DDR naar PC: × 8. Van PC naar DDR: ÷ 8.','Schrijf de naam volledig: PC3-12800 of DDR3-1600.'],
+  vb:['Vraag: DDR3-1600 = ?','Stap 1 · Generatie: DDR3 → PC3.','Stap 2 · 1600 × 8 = 12 800.','Stap 3 · Antwoord: PC3-12800.']},
+ {id:'E9',ch:'H6',title:'Werking van RAM in 5 stappen',gen:genE9,
+  uitleg:'1 De processor plaatst het adres op de adresbus. 2 De geheugencontroller bepaalt op welke chip het staat. 3 De hele rij (array) wordt ingelezen. 4 Met het kolomadres wordt de juiste geheugencel gekozen. 5 De gegevens gaan via de databus naar de processor.',
+  plan:['Begin bij de processor: adres op de adresbus.','Dan zoeken: chip (controller) → rij → kolom (cel).','Eindig bij de processor: databus.'],
+  vb:['Vergelijk met een stoel in de cinema.','Stap 1 · Je zegt je ticketnummer (adres).','Stap 2 · De juiste zaal zoeken (geheugenchip).','Stap 3 · De rij (array), daarna het stoelnummer (kolom), en dan ga je zitten: gegevens terug via de databus.']},
+ {id:'E10',ch:'H6',title:'Geheugenmodules en kenmerken',gen:genE10,
+  uitleg:'Random = willekeurig. Refresh: condensatoren verliezen hun lading. Generaties: SD-RAM 1, DDR 2, DDR2 4, DDR3 8 gegevens per klokpuls. DIMM = desktop, SO-DIMM = laptop, RIMM/CRIMM = Rambus. Single/dual/triple/quad channel. ECC voor servers. Aankoop: capaciteit, data access time, refresh rate, CAS-latency.',
+  plan:['Zoek het sleutelwoord: laptop/desktop, aantal modules, fouten, wachten …','Koppel het aan de term (SO-DIMM, dual channel, ECC, CAS-latency …).','Twijfel? Gebruik de Engelse betekenis: dual = 2, triple = 3, quad = 4.'],
+  vb:['Vraag: "Wat is efficiënter: 2 × 2 GB of 1 × 4 GB?"','Stap 1 · Sleutelwoord: aantal modules.','Stap 2 · Twee gelijke modules kunnen tegelijk werken: dual channel.','Stap 3 · Antwoord: 2 × 2 GB.']},
+ {id:'E11',ch:'P',title:'Waar zit het probleem?',gen:genE11,
+  uitleg:'In de praktijk krijg je geen definitie, maar een klacht. Je zoekt welk onderdeel of welk begrip de oorzaak is.',
+  plan:['Wat is het symptoom? (past niet, te heet, traag, start niet, gegevens weg)','Welk hoofdstuk hoort daarbij? (voet → H3, warmte → H4, flashen → H5, latjes → H6 …)','Kies de oorzaak die het symptoom verklaart.'],
+  vb:['Vraag: "Laptop op dekbed wordt heet en hapert."','Stap 1 · Symptoom: te heet.','Stap 2 · Hoofdstuk: koeling (H4). Laptop = ventilator met koperen geleiding.','Stap 3 · Oorzaak: de luchtgaten zijn afgesloten door het dekbed.']},
+ {id:'E12',ch:'mix',title:'Gemengde oefening',gen:()=>{const e=rnd(EX.filter(x=>x.id!=='E12'));const q=e.gen();q.from=e.title;return q;},
+  uitleg:'Hier komen alle soorten vragen door elkaar, zoals in de eindtoets.',plan:['Lees rustig: welk hoofdstuk is dit?','Gebruik het stappenplan van dat soort vraag.','Fout? Lees de feedback en probeer een nieuwe opgave.'],
+  vb:['Tip · Bovenaan elke opgave zie je uit welke oefening ze komt.','Tip · Twijfel je, open dan het tabblad Theorie in een tweede venster.','Tip · Een hint gebruiken mag; "Toon oplossing" telt niet als juist.']}];
+const REQ=EX.map(e=>e.id); // alle oefeningen bevatten toetsleerstof → allemaal verplicht
+const NEED=2;
+function okCount(id){return (S.prog[id]&&S.prog[id].ok)||0;}
+function allDone(){return REQ.every(id=>okCount(id)>=NEED);}
+function toetsOpen(){return S.unlocked||allDone();}
+
+/* ---------- theorie ---------- */
+const TJ={H1:[['Wat is RAM zonder stroom?','Leeg (vluchtig)',['Vol','Onveranderd']],['Wat doet de voeding?','Zet 230 V AC om in DC',['Maakt het beeld','Bewaart bestanden']]],
+H2:[['Welke controller regelt DMA?','System controller',['Peripheral controller','Memory controller']],['USB hangt aan de …','South bridge',['North bridge']],['Een toets indrukken geeft een …','Interrupt (IRQ)',['DMA']]],
+H3:[['Wat controleer je eerst?','Processorvoet',['Kloksnelheid','Cachegeheugen']],['2 miljoen in 2014, hoeveel in 2018?','8 miljoen',['4 miljoen','6 miljoen']]],
+H4:[['Koperen buisjes in een koeler heten …','Heatpipes',['Heatsink','Heatspreader']],['Kleine kast: welke koeler?','Top-flow koeler',['Tower koeler']]],
+H5:[['Nieuwe firmware schrijven heet …','Flashen',['Schaduwen','Refreshen']],['ROM zonder stroom:','Blijft bewaard',['Is leeg']]],
+H6:[['DDR3-1600 = …','PC3-12800',['PC3-3200','PC4-12800']],['Laptopgeheugen heet …','SO-DIMM',['DIMM','RIMM']],['Stap 3 van de werking van RAM:','De hele rij (array) inlezen',['Het kolomadres gebruiken','De databus']]]};
+const img=(f,c)=>`<figure><img src="img/${f}.jpg" alt="${esc(c)}" loading="lazy"><figcaption>${esc(c)}</figcaption></figure>`;
+const TH={
+H1:`<p>Een computer bestaat uit onderdelen die elk één taak hebben. Je hoeft ze niet te kunnen bouwen, wel herkennen en zeggen wat ze doen.</p>
+<div class="box vgl"><h4>Vergelijk: een restaurant</h4><p>Processor = chef-kok · RAM = werkblad · opslag = voorraadkast · ROM = vast recept aan de muur · moederbord = gebouw met gangen · chipset = verkeersagent · voeding = elektriciteitskast · koeler = dampkap.</p></div>
+<div class="fig">${img('cpu','Processor (CPU)')}${img('moederbord','Moederbord')}${img('ramlatje','Werkgeheugen (RAM)')}${img('voeding','Voeding (PSU)')}${img('sata','SATA-kabel')}</div>
+<div class="tbl"><table><tr><th>Onderdeel</th><th>Wat doet het?</th></tr>
+<tr><td>Processor (CPU)</td><td>Central Processing Unit: voert alle berekeningen uit.</td></tr>
+<tr><td>Moederbord</td><td>Grote printplaat waarop alles wordt aangesloten.</td></tr>
+<tr><td>Werkgeheugen (RAM)</td><td>Bevat wat nu open staat. Vluchtig: zonder stroom leeg.</td></tr>
+<tr><td>Opslag: SSD of HDD</td><td>Bewaart bestanden blijvend. SSD: geen bewegende delen, stil, schokbestendig, tot 10× sneller. HDD: draaiende schijf, veel ruimte.</td></tr>
+<tr><td>Grafische kaart (GPU)</td><td>Maakt het beeld. Ingebouwd (on board) volstaat voor school; voor games een aparte kaart.</td></tr>
+<tr><td>Voeding (PSU)</td><td>Zet 230 V wisselspanning (AC) om in gelijkspanning (DC) voor alle componenten.</td></tr>
+<tr><td>SATA-kabel</td><td>Dataverbinding tussen moederbord en harde schijf, SSD of dvd-station.</td></tr>
+<tr><td>Koeler</td><td>Voert de warmte van de processor af.</td></tr>
+<tr><td>Behuizing</td><td>De kast: beschermt tegen stof en stoten.</td></tr></table></div>
+<div class="box onthoud"><h4>Onthoud</h4><p>Geheugen (RAM) is iets anders dan opslag (SSD/HDD). RAM = nu bezig en vluchtig, opslag = bewaren.</p></div>
+<div class="box vb"><h4>Voorbeeld uit de opdracht PC Hardware</h4><p><b>Foto:</b> metalen doos met ventilator en veel kabels → <b>Wat:</b> PC-voeding → <b>Gebruik:</b> DC-spanning geven voor alle componenten in de computer.<br><b>Foto:</b> dunne platte rode kabel met L-stekker → <b>Wat:</b> SATA-kabel → <b>Gebruik:</b> dataverbinding tussen moederbord en harde schijf, SSD of dvd-station.</p></div>
+<p class="small">Webshops zoals de PC-Builder van ALTERNATE laten je kiezen in deze volgorde: CPU, moederbord, CPU-koeler, geheugen, grafische kaart, SSD, behuizing, case fan, voeding, besturingssysteem. Ze controleren of alles past.</p>`,
+H2:`<p>De <b>chipset</b> is een groep chips op het moederbord die al het verkeer regelt tussen processor, geheugen en randapparaten.</p>
+<div class="fig">${img('agent','De chipset: een verkeersagent')}${img('moederbord','Chipset op het moederbord')}</div>
+<div class="box vgl"><h4>Vergelijk: een verkeersagent</h4><p>Op een druk kruispunt bepaalt de agent wie mag rijden en wanneer. Zonder agent: botsingen en file.</p></div>
+<div class="box vb"><h4>Woorden die je eerst moet kennen</h4><p><b>Bus</b> = een snelweg voor gegevens (bundel draadjes op het moederbord). <b>Klokpuls</b> = één tik van het uurwerk (de klokgenerator); alles werkt op die maat. <b>Uitbreidingssleuf</b> = sleuf waarin je een extra kaart steekt. <b>Optisch station</b> = cd/dvd-station.</p></div>
+<h3>Functies van de chipset</h3>
+<div class="tbl"><table><tr><th>System controller</th><th>Peripheral controller</th><th>Memory controller</th></tr>
+<tr><td>klokgenerator<br>interrupts<br>DMA<br>energiebeheer</td><td>uitbreidingskaarten<br>HDD / optische stations<br>toetsenbord<br>I/O controller randapparaten</td><td>besturing werkgeheugen</td></tr></table></div>
+<p>De chipset <b>bepaalt</b>: type processor, type werkgeheugen, capaciteit werkgeheugen, snelheid systeembus, aantal en soort uitbreidingssleuven, energiebeheer en controle op temperatuur van de CPU. <b>On board video</b> (grafische chip ingebouwd) is goedkoop en zuinig; een <b>aparte grafische kaart</b> is krachtiger.</p>
+<h3>Structuur</h3>
+<ul><li><b>North bridge</b> (Intel: MCH, Memory Controller Hub, of GMCH met grafische chip): verbindt de processor met de <b>snellere</b> onderdelen (RAM, grafische kaart). Tussen processor en north bridge loopt de <b>FSB</b> (Front Side Bus).</li>
+<li><b>South bridge</b> (Intel: ICH, I/O Controller Hub): verbindt de processor met de <b>tragere</b> onderdelen (USB, SATA, toetsenbord, geluid, netwerk).</li>
+<li>North en south bridge zijn verbonden via de <b>Interlink Dedicated Bus</b>.</li></ul>
+<p class="small">Aanvulling: in moderne pc's zit de north bridge in de processor; de overgebleven chip heet PCH.</p>
+<h3>DMA en interrupts</h3>
+<p><b>DMA (Direct Memory Access):</b> een randapparaat zet gegevens rechtstreeks in het RAM via de DMA-controller, zonder de processor. <b>Interrupt (IRQ, Interrupt ReQuest):</b> een randapparaat vraagt via de chipset aandacht van de processor.</p>
+<div class="box vgl"><h4>Vergelijk</h4><p>DMA = de leverancier zet de dozen rechtstreeks in de koelcel. Interrupt = de ober tikt op de bel: "Bestelling!"</p></div>
+<div class="box vb"><h4>Voorbeeld: je drukt op "a"</h4><p>1 Het toetsenbord stuurt een IRQ naar de chipset. 2 De chipset geeft het door aan de CPU. 3 De CPU onderbreekt zijn werk en leest de toets. 4 De "a" verschijnt. 5 De CPU gaat verder.</p></div>
+<div class="box onthoud"><h4>Onthoud</h4><p>System = klok en regels (ook DMA en interrupts) · Peripheral = alles rondom · Memory = geheugen. North = snel, south = traag. DMA = gegevens verplaatsen zonder CPU, interrupt = aandacht vragen.</p></div>`,
+H3:`<p>Bijna alle processoren komen van <b>Intel</b> of <b>AMD</b>. Een Intel-processor past niet op een AMD-moederbord en omgekeerd.</p>
+<div class="fig">${img('desktop','Desktop')}${img('laptop','Laptop')}${img('moore','Wet van Moore 1971–2008')}</div>
+<p><b>Desktops versus laptops:</b> een laptop werkt op een batterij en neemt energiebesparende maatregelen: de <b>kloksnelheid wordt aangepast aan de belasting</b>.</p>
+<div class="box vgl"><h4>Vergelijk: een fietser die schakelt</h4><p>Bergop trapt hij hard, op een vlakke weg rustig.</p></div>
+<h3>Factoren bij de aankoop</h3>
+<div class="tbl"><table><tr><th>Factor</th><th>Uitleg</th><th>Vergelijking</th></tr>
+<tr><td>Processorvoet</td><td>Socket op het moederbord, moet exact passen</td><td>stekker en stopcontact</td></tr>
+<tr><td>Merk</td><td>Intel of AMD</td><td>twee automerken</td></tr>
+<tr><td>Aantal processorkernen</td><td>Cores: meer taken tegelijk</td><td>aantal koks</td></tr>
+<tr><td>Kloksnelheid</td><td>GHz: 3 GHz = 3 miljard tikken per seconde</td><td>hoe snel één kok werkt</td></tr>
+<tr><td>Energieverbruik</td><td>Watt: meer watt = meer warmte</td><td>—</td></tr>
+<tr><td>Cachegeheugen</td><td>MB: klein supersnel geheugen in de processor</td><td>kruidenrekje naast het fornuis</td></tr></table></div>
+<div class="box vb"><h4>Voorbeeld: Lisa, moederbord met voet AM4</h4><p>AMD Ryzen 5 5600 (AM4, 6 kernen, 3,5 GHz, 65 W, 32 MB) of Intel Core i5-12400 (LGA1700, 6 kernen, 2,5 GHz, 65 W, 18 MB)? Stap 1: alleen de Ryzen past op AM4. Stap 2: AM4 = AMD, klopt. Stap 3: kernen, klok, cache prima. Stap 4: 65 W, gewone koeler. Besluit: Ryzen 5 5600.</p></div>
+<h3>De wet van Moore</h3>
+<p>Gordon Moore (1965): het aantal transistors op een chip <b>verdubbelt ongeveer elke 2 jaar</b>.</p>
+<div class="box vb"><h4>Voorbeeld</h4><p>1 miljoen transistors in 2010. In 2016? 6 jaar ÷ 2 = 3 keer verdubbelen: 1 → 2 → 4 → <b>8 miljoen</b>.</p></div>
+<div class="box onthoud"><h4>Onthoud</h4><p>Eerst passen (voet, merk), dan kwaliteit (kernen, kloksnelheid, cache), dan warmte (energieverbruik). Moore: jaren ÷ 2 = aantal keer × 2.</p></div>`,
+H4:`<p>Een processor zet stroom om in warmte. Te heet? Dan vertraagt hij of valt de pc uit.</p>
+<div class="fig">${img('koelerdelen','Heatsink, heatpipes, ventilator')}${img('topflow','Top-flow koeler')}${img('tower','Tower koeler')}</div>
+<ul><li><b>Heatsink</b>: metalen blok met vinnen (zoals een radiator).</li><li><b>Heatpipes</b>: koperen buisjes die de warmte snel wegbrengen.</li><li><b>Ventilator</b>: blaast de warmte weg.</li></ul>
+<p><b>Top-flow koeler</b>: ventilator plat bovenop, blaast naar beneden, laag en compact. <b>Tower koeler</b>: hoog, ventilator aan de zijkant, koelt beter maar is groot.</p>
+<h3>Voor gevorderden</h3>
+<div class="fig">${img('waterkoeling','Water- en oliekoeling')}${img('peltier','Peltier-koeling (TEC)')}${img('phasechanger','Phase changer')}${img('stikstof','Vloeibare stikstof')}</div>
+<ul><li><b>Water- en oliekoeling</b>: pomp + vloeistof, populair bij casemodding.</li><li><b>Peltier-koeling</b>, TEC (Thermo Electric Cooler): met stroom één kant koud.</li><li><b>Phase changer</b>: werkt als een koelkast; een serie heet een <b>cascade</b>. Volgens de cursus enkel voor supercomputers.</li><li><b>Vloeibare stikstof</b>: wordt verbruikt tijdens de koeling. Volgens de cursus enkel voor supercomputers.</li></ul>
+<h3>Laptops, controle en onderhoud</h3>
+<div class="fig">${img('laptopkoeler','Ventilator met koperen geleiding')}${img('koelplateau','Koelplateau')}${img('hwmonitor','Temperatuurcontrole (HWMonitor)')}${img('stof','Stof: reinigen!')}</div>
+<p>Laptop: <b>ventilator met koperen geleiding</b> en eventueel een <b>koelplateau</b>. <b>Temperatuurcontrole</b> met een programma zoals HWMonitor. <b>Koelventilatoren reinigen</b>: pc uit, stekker eruit, stof wegblazen.</p>
+<div class="box vb"><h4>Voorbeeld: Jonas, stille pc, kleine kast (max 120 mm), voet AM4</h4><p>A: tower 160 mm, AM4, 25 dB · B: top-flow 70 mm, AM4, 30 dB · C: top-flow 65 mm, LGA1700, 22 dB. Compatibiliteit: C valt af. Type: A te hoog. Geluidsniveau: B. Besluit: <b>koeler B</b>.</p></div>
+<div class="box onthoud"><h4>Onthoud</h4><p>Aankoop koeler: type, compatibiliteit met moederbord, geluidsniveau. Heatsink = vinnen, heatpipes = buisjes, heatspreader = plaatje op RAM (H6).</p></div>`,
+H5:`<p><b>ROM = Read Only Memory</b>: geheugen dat je (normaal) alleen leest. De inhoud blijft bewaard zonder stroom. Er staat <b>firmware</b> in, bv. het BIOS/UEFI dat de pc opstart.</p>
+<div class="fig">${img('romchip','ROM-chip')}</div>
+<div class="box vgl"><h4>Vergelijk</h4><p>Het recept dat in de keukenmuur gebeiteld is: iedereen kan het lezen, niemand wist het per ongeluk uit.</p></div>
+<h3>Bouw van ROM</h3>
+<p>Read Only Memory → niet herprogrammeerbaar → moeilijk herprogrammeerbaar → "flashen".</p>
+<ul><li><b>EEPROM</b> = Electrically Erasable Programmable ROM: elektrisch wisbaar en opnieuw programmeerbaar.</li><li><b>Flash ROM</b> (flash-geheugen): snellere soort die in blokken gewist wordt, zoals een USB-stick.</li><li><b>Flashen</b> = nieuwe firmware in het ROM schrijven.</li></ul>
+<h3>Lezen uit het ROM: schaduwen</h3>
+<p>ROM is <b>traag</b> toegankelijk, RAM <b>snel</b>. Bij het opstarten kopieert de pc de inhoud van het ROM naar het RAM: <b>schaduwen</b> (shadowing).</p>
+<div class="box vgl"><h4>Vergelijk</h4><p>Je schrijft het recept van de muur over op een briefje op je werkblad.</p></div>
+<p><b>Toepassingen:</b> firmware op andere computeronderdelen (grafische kaart, harde schijf, dvd-station) en in allerlei elektronische apparaten (wasmachine, tv, router, printer, gameconsole).</p>
+<div class="box vb"><h4>Voorbeeld uit het leven</h4><p>"Systeemupdate bezig, zet het toestel niet uit": je console wordt geflasht. Valt de stroom halverwege, dan staat er een halve firmware in het ROM en start het toestel niet meer.</p></div>
+<div class="box onthoud"><h4>Onthoud</h4><p>ROM: blijft zonder stroom, bevat firmware. Flashen = schrijven. Schaduwen = ROM → RAM voor snelheid.</p></div>`,
+H6:`<p><b>RAM = Random Access Memory</b>. Random = willekeurig: elke geheugencel is even snel bereikbaar, in eender welke volgorde. RAM is vluchtig.</p>
+<div class="box vgl"><h4>Vergelijk</h4><p>Een kast met genummerde laatjes: je opent meteen laatje 512. Refresh: een lekke fietsband die je steeds bijpompt.</p></div>
+<p><b>Refresh rate:</b> elke cel is een condensator, en condensatoren behouden stroom slechts erg kort, dus ze moeten steeds ververst worden. De frequentie van het RAM wordt aangepast aan de FSB.</p>
+<h3>Geheugengeneraties</h3>
+<div class="tbl"><table><tr><th>Generatie</th><th>Gegevens per klokpuls (cursus)</th><th>Status</th></tr><tr><td>SD-RAM</td><td class="num">1</td><td>verouderd</td></tr><tr><td>DDR (Double Data Rate)</td><td class="num">2</td><td>verouderd</td></tr><tr><td>DDR2</td><td class="num">4</td><td>oud</td></tr><tr><td>DDR3</td><td class="num">8</td><td>oud</td></tr><tr><td>DDR4 / DDR5</td><td>2014 / 2020 (aanvulling)</td><td>nu</td></tr></table></div>
+<p>Elke generatie heeft de inkeping op een andere plaats: een DDR4-latje past niet in een DDR3-sleuf.</p>
+<div class="box vb"><h4>Voorbeeld: DDR3-1600 = PC3-12800</h4><p>Stap 1: generatie blijft gelijk (DDR3 → PC3). Stap 2: per overdracht 8 bytes. Stap 3: 1600 × 8 = 12 800 MB/s → PC3-12800. Omgekeerd: PC4-25600 → 25 600 ÷ 8 = 3200 → DDR4-3200.<br><span class="small">Let op: in de cursus staat "12 800 Mbit/s"; juist is MB/s.</span></p></div>
+<h3>Werking van RAM</h3>
+<div class="fig">${img('ramschema','Processor, geheugencontroller, chip, array, cel')}</div>
+<ol><li>De processor plaatst het gewenste geheugenadres op de adresbus van de systeembus.</li><li>De geheugencontroller bepaalt op welke geheugenchip dit adres te vinden is.</li><li>Van de juiste geheugenchip wordt de hele rij (array) ingelezen.</li><li>Daarna wordt uit die array de juiste geheugencel gepikt op basis van het kolomadres.</li><li>De gegevens uit die geheugencel worden op de databus geplaatst, naar de processor.</li></ol>
+<div class="box vgl"><h4>Vergelijk: een stoel in de cinema</h4><p>Zaal (chip) → rij (array) → stoelnummer (kolom).</p></div>
+<h3>Geheugenmodules</h3>
+<div class="fig">${img('heatspreader','Heatspreader')}${img('dimm','DIMM (desktop)')}${img('sodimm','SO-DIMM (laptop)')}${img('sticker','Sticker')}${img('rimm','RIMM en CRIMM')}</div>
+<ul><li><b>DIMM</b> (desktop) · <b>SO-DIMM</b> (laptop) · <b>heatspreader</b> (warmteverspreider).</li><li>Sticker: capaciteit, aantal geheugenchips, typenummer, generatie, refresh rate, geheugentype, CAS-latency.</li><li>Niet alle sleuven moeten gevuld zijn. Uitzondering: Rambus-geheugen (<b>RIMM</b>), lege sleuf = <b>CRIMM</b>.</li><li><b>Single channel</b>: per klokpuls slechts één module. <b>Dual channel</b>: twee tegelijk (zelfde type en capaciteit; 2 × 2 GB is efficiënter dan 1 × 4 GB). <b>Triple</b>: drie. <b>Quad</b>: vier.</li><li><b>ECC</b> (Error Correction Code): dubbele controle op fouten, voor servers.</li><li>Aankoop: <b>capaciteit</b>, <b>data access time</b>, <b>refresh rate</b>, <b>CAS-latency</b> (lager = sneller).</li><li>Practicum: werkgeheugen plaatsen in desktop en laptop, geheugen testen (Windows Geheugendiagnose).</li></ul>
+<div class="box onthoud"><h4>Onthoud</h4><p>PC-getal = DDR-getal × 8. Adres → controller → rij → kolom → data. Laptop = SO-DIMM. Dual channel = 2 gelijke modules.</p></div>`};
+
+/* ---------- weergave ---------- */
+let TAB='theorie', CUR={ex:'E1',ch:'H1'};
+function setTab(t){if(!['theorie','oefenen','praktijk','toets'].includes(t))t='theorie';TAB=t;S.lastTab=t;save();
+ document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t?'true':'false'));
+ try{history.replaceState(null,'','#'+t);}catch(e){}
+ render();window.scrollTo(0,0);}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.tab)));
+function updLock(){$('#tabLock').textContent=toetsOpen()?'open':'op slot';}
+function render(){updLock();const m=$('#main');
+ if(S.toets&&!S.toets.finished&&TAB!=='toets'){m.innerHTML=`<section class="panel"><h2>Je eindtoets is bezig</h2><p class="lead">Theorie, Oefenen en Praktijk zijn gesloten tot je inlevert. Het rapport toont hoe vaak je de toets verlaten hebt.</p><div><button class="btn acc" type="button" id="backT">Terug naar de toets</button></div></section>`;$('#backT').onclick=()=>setTab('toets');return;}
+ if(TAB==='theorie')m.innerHTML=renderTheorie();
+ else if(TAB==='oefenen'){m.innerHTML=renderOefenen();bindOefenen();}
+ else if(TAB==='praktijk'){m.innerHTML=renderPraktijk();bindPraktijk();}
+ else {m.innerHTML=renderToets();bindToets();}
+ if(TAB==='theorie')bindTheorie();}
+
+/* Theorie */
+function renderTheorie(){const c=CUR.ch;
+ const nav=Object.keys(TH).map(k=>`<button class="navbtn" data-ch="${k}" aria-current="${k===c}"><span><small>${k}</small>${CH[k]}</span></button>`).join('')+`<button class="navbtn" data-ch="W" aria-current="${c==='W'}"><span><small>Alles</small>Woordenlijst</span></button>`;
+ let body;
+ if(c==='W'){body=`<p class="eyebrow">Woordenlijst</p><h2>Alle begrippen</h2><input type="text" id="gSearch" placeholder="Zoek een begrip, bv. heatsink" aria-label="Zoek in de woordenlijst"><dl class="glos" id="gList">${glosHTML('')}</dl>`;}
+ else{const tj=TJ[c].map((t,i)=>{const opts=shuffle([t[1],...t[2]]);return `<div class="q" data-tj="${i}"><p class="prompt">${esc(t[0])}</p><div class="opts">${opts.map(o=>`<button class="opt" data-a="${esc(o)}" data-ok="${o===t[1]}">${esc(o)}</button>`).join('')}</div><div class="fbx"></div></div>`;}).join('');
+  const words=Object.keys(G).filter(k=>G[k][1]===c);
+  body=`<p class="eyebrow">${c} · Theorie</p><h2>${CH[c]}</h2><div class="prose">${TH[c]}</div><h3>Test jezelf</h3><div class="tj">${tj}</div><h3>Woordenlijst ${c}</h3><dl class="glos">${words.map(k=>`<dt>${esc(k)}</dt><dd>${esc(G[k][0])}</dd>`).join('')}</dl>`;}
+ return `<div class="split"><nav class="side" aria-label="Hoofdstukken">${nav}</nav><section class="panel">${body}</section></div>`;}
+function glosHTML(f){f=f.toLowerCase();return Object.keys(G).sort((a,b)=>a.localeCompare(b,'nl')).filter(k=>!f||k.toLowerCase().includes(f)||G[k][0].toLowerCase().includes(f)).map(k=>`<dt>${esc(k)} <span class="small">${G[k][1]}</span></dt><dd>${esc(G[k][0])}</dd>`).join('')||'<dd>Niets gevonden. Probeer een ander woord.</dd>';}
+function bindTheorie(){document.querySelectorAll('.side .navbtn').forEach(b=>b.onclick=()=>{CUR.ch=b.dataset.ch;render();});
+ const s=$('#gSearch');if(s)s.oninput=()=>{$('#gList').innerHTML=glosHTML(s.value);};
+ document.querySelectorAll('.tj .q').forEach(q=>q.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{const ok=o.dataset.ok==='true';q.querySelectorAll('.opt').forEach(x=>{x.classList.remove('right','wrong');if(x.dataset.ok==='true'&&ok)x.classList.add('right');});o.classList.add(ok?'right':'wrong');
+  const right=[...q.querySelectorAll('.opt')].find(x=>x.dataset.ok==='true').dataset.a;q.querySelector('.fbx').innerHTML=ok?`<div class="fb ok"><b>Juist!</b></div>`:`<div class="fb no"><b>Nog niet.</b> ${gloss(o.dataset.a)?esc(o.dataset.a)+': '+esc(gloss(o.dataset.a))+' ':''}Probeer opnieuw of lees de uitleg hierboven.</div>`;}));}
+
+/* Oefenen */
+const Q={}; // huidige opgave per oefening
+const RECENT={};
+function newQ(id){const e=EX.find(x=>x.id===id);let q,tries=0;RECENT[id]=RECENT[id]||[];
+ do{q=e.gen();tries++;}while(RECENT[id].includes(q.prompt)&&tries<12);
+ RECENT[id].push(q.prompt);if(RECENT[id].length>6)RECENT[id].shift();
+ q.state={sel:null,order:[],done:false,shown:false,hintShown:false};Q[id]=q;return q;}
+function renderOefenen(){const e=EX.find(x=>x.id===CUR.ex);const q=Q[e.id]||newQ(e.id);
+ const nav=EX.map(x=>{const n=okCount(x.id);return `<button class="navbtn" data-ex="${x.id}" aria-current="${x.id===e.id}"><span><small>${x.ch==='mix'?'Alles':x.ch==='P'?'Praktijk':x.ch} · verplicht</small>${esc(x.title)}</span><span class="pill ${n>=NEED?'ok':'todo'}">${n>=NEED?'✓ ':''}${Math.min(n,99)}/${NEED}</span></button>`;}).join('');
+ const done=REQ.filter(id=>okCount(id)>=NEED).length;
+ const vbSteps=e.vb.map((s,i)=>`<p class="st" ${i>0?'hidden':''} data-st="${i}">${esc(s)}</p>`).join('');
+ return `<p class="lead" style="margin-bottom:14px">Maak elke oefening tot je <b>minstens ${NEED} juiste antwoorden</b> hebt. Dan gaat de eindtoets open. Je hebt nu <b>${done} van ${REQ.length}</b> oefeningen klaar.</p>
+ <div class="progress" style="margin-bottom:20px" aria-label="Voortgang"><i style="width:${Math.round(done/REQ.length*100)}%"></i></div>
+ <div class="split"><nav class="side" aria-label="Oefeningen">${nav}</nav>
+ <section class="panel" id="exPanel"><div><p class="eyebrow">${e.ch==='mix'?'Alle hoofdstukken':e.ch==='P'?CH.P:e.ch+' · '+CH[e.ch]}</p><h2>${esc(e.title)}</h2><p class="small">Juist beantwoord: <b>${okCount(e.id)}</b> (minstens ${NEED} nodig)</p></div>
+ <details class="uitleg" ${okCount(e.id)===0?'open':''}><summary>Uitleg, stappenplan en uitgewerkt voorbeeld</summary><div>
+ <p>${esc(e.uitleg)}</p><div class="box onthoud"><h4>Stappenplan</h4><ol style="margin:0;padding-left:20px">${e.plan.map(p=>`<li>${esc(p)}</li>`).join('')}</ol></div>
+ <div class="box vb"><h4>Uitgewerkt voorbeeld</h4><div class="stepper">${vbSteps}</div><div class="row"><button class="btn ghost" id="vbNext" type="button">Volgende stap</button><button class="btn ghost" id="vbReset" type="button">Opnieuw</button></div></div></div></details>
+ <div class="q" id="qBox">${renderQ(q,e)}</div></section></div>`;}
+function renderQ(q,e){let inp='';
+ if(q.type==='mc')inp=`<div class="opts">${q.options.map(o=>`<button class="opt" type="button" data-o="${esc(o)}" aria-pressed="${q.state.sel===o}">${esc(o)}</button>`).join('')}</div>`;
+ else if(q.type==='num')inp=`<div class="row"><input type="text" id="qIn" inputmode="decimal" autocomplete="off" aria-label="Jouw antwoord" style="width:180px"><span>${esc(q.unit||'')}</span></div>`;
+ else if(q.type==='text')inp=`<div class="row"><input type="text" id="qIn" autocomplete="off" placeholder="${esc(q.placeholder||'')}" aria-label="Jouw antwoord" style="width:220px"></div>`;
+ else if(q.type==='order'){q.state.pool=q.state.pool||shuffle(q.items);inp=`<ol class="chosen" id="chosen">${q.state.order.map(i=>`<li>${esc(i)}</li>`).join('')}</ol><div class="ordersel">${q.state.pool.map(i=>`<button type="button" data-i="${esc(i)}" ${q.state.order.includes(i)?'disabled':''}>${esc(i)}</button>`).join('')}</div><div><button class="btn ghost" type="button" id="ordClear">Wis volgorde</button></div>`;}
+ return `${q.from?`<p class="small">Uit: ${esc(q.from)}</p>`:''}<p class="prompt">${q.type==='mc'&&q.prompt.includes('<br>')?q.prompt:esc(q.prompt).replace(/&lt;b&gt;|&lt;\/b&gt;/g,m=>m.includes('/')?'</b>':'<b>')}</p>${inp}
+ <div class="row"><button class="btn acc" type="button" id="qCheck">Controleer</button><button class="btn ghost" type="button" id="qHint">Hint</button><button class="btn ghost" type="button" id="qSol">Toon oplossing</button><button class="btn ghost" type="button" id="qNew">Nieuwe opgave</button></div><div id="qFb" aria-live="polite"></div>`;}
+function bindOefenen(){document.querySelectorAll('.side .navbtn').forEach(b=>b.onclick=()=>{CUR.ex=b.dataset.ex;render();});
+ const e=EX.find(x=>x.id===CUR.ex);let vbI=0;const nx=$('#vbNext');
+ if(nx){nx.onclick=()=>{vbI=Math.min(vbI+1,e.vb.length-1);document.querySelectorAll('.stepper .st').forEach(s=>s.hidden=+s.dataset.st>vbI);if(vbI===e.vb.length-1)nx.disabled=true;};$('#vbReset').onclick=()=>{vbI=0;nx.disabled=false;document.querySelectorAll('.stepper .st').forEach(s=>s.hidden=+s.dataset.st>0);};}
+ bindQ(e);}
+function bindQ(e){const q=Q[e.id];const box=$('#qBox');
+ box.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{if(q.state.done)return;q.state.sel=o.dataset.o;box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===o?'true':'false'));});
+ box.querySelectorAll('.ordersel button').forEach(b=>b.onclick=()=>{if(q.state.done)return;q.state.order.push(b.dataset.i);rerenderQ(e);});
+ const oc=$('#ordClear');if(oc)oc.onclick=()=>{if(q.state.done)return;q.state.order=[];rerenderQ(e);};
+ const inp=$('#qIn');if(inp)inp.onkeydown=ev=>{if(ev.key==='Enter')$('#qCheck').click();};
+ $('#qCheck').onclick=()=>checkQ(e);
+ $('#qHint').onclick=()=>{q.state.hintShown=true;$('#qFb').innerHTML=`<div class="fb hint"><b>Hint:</b> ${esc(q.hint)}</div>`;};
+ $('#qSol').onclick=()=>{q.state.shown=true;q.state.done=true;$('#qFb').innerHTML=`<div class="fb sol"><b>Oplossing:</b> ${esc(ansText(q))}<br>${esc(q.why)}<br><span class="small">Een getoonde oplossing telt niet als juist. Klik op "Nieuwe opgave".</span></div>`;markMC(q,box);};
+ $('#qNew').onclick=()=>{newQ(e.id);rerenderQ(e);};}
+function rerenderQ(e){$('#qBox').innerHTML=renderQ(Q[e.id],e);bindQ(e);}
+function ansText(q){return q.type==='order'?q.items.map((x,i)=>(i+1)+'. '+x).join('  '):String(q.answer);}
+function markMC(q,box){if(q.type!=='mc')return;box.querySelectorAll('.opt').forEach(x=>{if(x.dataset.o===q.answer)x.classList.add('right');else if(x.dataset.o===q.state.sel)x.classList.add('wrong');});}
+function judge(q,val){ // geeft {ok, msg, empty}
+ if(q.type==='mc'){if(val==null)return {empty:true};return {ok:val===q.answer,msg:val===q.answer?'':`Je koos "${val}". ${gloss(val)&&gloss(val)!==gloss(q.answer)?'Dat is: '+gloss(val)+' ':''}`};}
+ if(q.type==='num'){const v=parseNum(val);if(v===null)return {empty:true};const ok=Math.abs(v-q.answer)<1e-9;return {ok,msg:ok?'':(q.diag&&q.diag(v))||'Dat getal klopt niet. Volg het stappenplan.'};}
+ if(q.type==='text'){if(!String(val||'').trim())return {empty:true};const ok=normMem(val)===normMem(q.answer);return {ok,msg:ok?'':(q.diag&&q.diag(val))||'Dat klopt niet. Kijk naar het stappenplan.'};}
+ if(q.type==='order'){if(!val||val.length<q.items.length)return {empty:true};const ok=val.every((x,i)=>x===q.items[i]);let first=val.findIndex((x,i)=>x!==q.items[i]);return {ok,msg:ok?'':`Stap ${first+1} klopt niet: daar hoort "${q.items[first]}".`};}}
+function checkQ(e){const q=Q[e.id];const box=$('#qBox');if(q.state.done){$('#qFb').innerHTML=`<div class="fb sol">Deze opgave is afgerond. Klik op "Nieuwe opgave".</div>`;return;}
+ let val=q.type==='mc'?q.state.sel:q.type==='order'?q.state.order:$('#qIn').value;
+ const r=judge(q,val);
+ if(r.empty){$('#qFb').innerHTML=`<div class="fb hint">${q.type==='mc'?'Kies eerst een antwoord.':q.type==='order'?'Klik eerst alle stappen aan.':'Vul eerst een antwoord in.'}</div>`;return;}
+ q.state.done=true;const p=S.prog[e.id]=S.prog[e.id]||{ok:0,tries:0};p.tries++;
+ if(e.id==='E12'){}
+ if(r.ok){p.ok++;}
+ save();markMC(q,box);const inp=$('#qIn');if(inp)inp.classList.add(r.ok?'good':'bad');
+ $('#qFb').innerHTML=r.ok?`<div class="fb ok"><b>Juist!</b> ${esc(q.why)}${p.ok===NEED?'<br><b>Deze oefening is in orde voor de toets.</b>':''}</div>`:`<div class="fb no"><b>Niet juist.</b> ${esc(r.msg)}<br><b>Juist:</b> ${esc(ansText(q))}. ${esc(q.why)}</div>`;
+ // navigatie-teller bijwerken
+ const nb=document.querySelector(`.navbtn[data-ex="${e.id}"] .pill`);if(nb){nb.className='pill '+(p.ok>=NEED?'ok':'todo');nb.textContent=(p.ok>=NEED?'✓ ':'')+p.ok+'/'+NEED;}
+ const sm=document.querySelector('#exPanel .small b');if(sm)sm.textContent=p.ok;updLock();}
+
+/* ---------- Praktijk ---------- */
+const PF=[
+ {sec:'1 · Processor',how:'Druk <b>Ctrl + Shift + Esc</b> → <b>Prestaties</b> → <b>CPU</b>.',fields:[
+  {id:'cpuNaam',lab:'Naam van de processor (rechtsboven)',type:'text',ph:'bv. Intel(R) Core(TM) i5-1235U'},
+  {id:'cpuMerk',lab:'Merk',type:'select',opts:['','Intel','AMD','Ander merk (bv. Apple, Qualcomm)']},
+  {id:'cpuGhz',lab:'Basissnelheid (GHz)',type:'number',ph:'bv. 1,30'},
+  {id:'cpuKern',lab:'Kernen',type:'number',ph:'bv. 10'},
+  {id:'cpuLog',lab:'Logische processors',type:'number',ph:'bv. 12'},
+  {id:'cpuL3',lab:'L3-cache (MB)',type:'number',ph:'bv. 12'},
+  {id:'cpuVar',lab:'Kijk 10 seconden naar "Snelheid". Verandert ze?',type:'select',opts:['','Ja, ze springt op en neer','Nee, ze blijft gelijk']}]},
+ {sec:'2 · Werkgeheugen',how:'In Taakbeheer → <b>Prestaties</b> → <b>Geheugen</b>. Kijk rechtsboven en onderaan.',fields:[
+  {id:'pcType',lab:'Wat voor computer is dit?',type:'select',opts:['','Laptop','Desktop']},
+  {id:'ramGb',lab:'Totaal geheugen (GB, rechtsboven)',type:'number',ph:'bv. 16'},
+  {id:'ramMts',lab:'Snelheid (MT/s; Windows 10 toont MHz: zelfde getal)',type:'number',ph:'bv. 3200'},
+  {id:'slotUsed',lab:'Gebruikte sleuven: … van …  (eerste getal)',type:'number',ph:'bv. 2'},
+  {id:'slotTot',lab:'… van … (tweede getal)',type:'number',ph:'bv. 2'},
+  {id:'vorm',lab:'Vormfactor',type:'select',opts:['','DIMM','SODIMM','Iets anders / niet vermeld']},
+  {id:'gen',lab:'Leid de generatie af uit de snelheid (tabel hieronder)',type:'select',opts:['','DDR3','DDR4','DDR5','LPDDR (gesoldeerd laptopgeheugen)']},
+  {id:'pcNaam',lab:'Reken de PC-naam uit (snelheid × 8)',type:'text',ph:'bv. PC4-25600'},
+  {id:'dual',lab:'Werkt je geheugen waarschijnlijk in dual channel?',type:'select',opts:['','Ja','Nee']}]},
+ {sec:'3 · ROM en firmware',how:'Druk de <b>Windows-toets</b>, typ <b>msinfo32</b> en druk Enter (Systeeminformatie → Systeemoverzicht).',fields:[
+  {id:'bios',lab:'BIOS-versie/-datum',type:'text',ph:'bv. LENOVO N3HET80W, 12/03/2023'},
+  {id:'biosMode',lab:'BIOS-modus',type:'select',opts:['','UEFI','Verouderd (Legacy)']},
+  {id:'mobo',lab:'Fabrikant basisbord (moederbord)',type:'text',ph:'bv. LENOVO of ASUSTeK'},
+  {id:'romQ',lab:'In welk soort geheugen staat het BIOS/UEFI?',type:'select',opts:['','Flash ROM','Werkgeheugen (RAM)','Cachegeheugen']}]},
+ {sec:'4 · Koeling',how:'Kijk en luister naar je computer. Waar gaat de warme lucht naar buiten?',fields:[
+  {id:'koel',lab:'Welke processorkoeling heeft jouw computer waarschijnlijk?',type:'select',opts:['','Ventilator met koperen geleiding','Top-flow of tower koeler','Waterkoeling','Vloeibare stikstof']}]}];
+const SAMPLE={cpuNaam:'Intel(R) Core(TM) i5-1235U',cpuGhz:'1.3',cpuKern:'10',cpuLog:'12',cpuL3:'12',ramGb:'16',ramMts:'3200',slotUsed:'2',slotTot:'2',vorm:'SODIMM',bios:'VOORBEELD-BIOS 1.08, 15/01/2024',biosMode:'UEFI',mobo:'VOORBEELD'};
+const GENS=[['DDR3',800,2133],['DDR4',1600,3600],['DDR5',4000,8800]];
+function pv(id){return (S.prak[id]||'').toString().trim();}
+function pnum(id){const v=pv(id).replace(',','.');return v===''?NaN:+v;}
+function pcheck(){const m={};const set=(id,cls,t)=>m[id]={cls,t};
+ const naam=pv('cpuNaam').toLowerCase();let merkUit='';if(/intel/.test(naam))merkUit='Intel';else if(/amd|ryzen|athlon/.test(naam))merkUit='AMD';else if(/apple|qualcomm|snapdragon|arm/.test(naam))merkUit='Ander merk (bv. Apple, Qualcomm)';
+ if(!naam)set('cpuNaam','no','Vul de volledige naam in zoals in Taakbeheer.');else if(!merkUit)set('cpuNaam','warn','Ik herken geen merk. Typ de naam precies over (met Intel of AMD).');else set('cpuNaam','ok','Merk in de naam: '+merkUit.split(' (')[0]+'.');
+ const merk=pv('cpuMerk');if(!merk)set('cpuMerk','no','Kies het merk.');else if(merkUit&&merk!==merkUit)set('cpuMerk','no','Klopt niet met de naam: daarin staat '+merkUit.split(' (')[0]+'.');else set('cpuMerk','ok','Klopt.');
+ const g=pnum('cpuGhz');if(isNaN(g))set('cpuGhz','no','Vul de basissnelheid in (in GHz).');else if(g>100)set('cpuGhz','no','Dat is in MHz. Deel door 1000: GHz.');else if(g<0.4||g>6.5)set('cpuGhz','no','Een basissnelheid ligt tussen 0,4 en 6,5 GHz. Kijk opnieuw.');else set('cpuGhz','ok',`${String(g).replace('.',',')} GHz = ${String(g).replace('.',',')} miljard tikken per seconde.`);
+ const k=pnum('cpuKern'),l=pnum('cpuLog');if(isNaN(k)||k<1||k>256||k%1)set('cpuKern','no','Vul een geheel aantal kernen in (1 tot 256).');else set('cpuKern','ok',k+' kernen = '+k+' koks.');
+ if(isNaN(l)||l%1)set('cpuLog','no','Vul het aantal logische processors in.');else if(!isNaN(k)&&(l<k||l>2*k))set('cpuLog','no','Logische processors liggen tussen het aantal kernen en het dubbele ('+k+' tot '+2*k+'). Kijk opnieuw.');else set('cpuLog','ok','Klopt met het aantal kernen.');
+ const c3=pnum('cpuL3');if(isNaN(c3))set('cpuL3','no','Vul de L3-cache in (in MB). Staat er KB? Deel door 1024.');else if(c3<0.5||c3>512)set('cpuL3','no','L3-cache ligt meestal tussen 1 en 512 MB. Staat er KB? Deel door 1024.');else set('cpuL3','ok','Het kruidenrekje: '+String(c3).replace('.',',')+' MB.');
+ if(!pv('cpuVar'))set('cpuVar','no','Kies een antwoord.');else set('cpuVar','ok',pv('cpuVar').startsWith('Ja')?'Juist: kloksnelheid aangepast aan belasting.':'Doe iets zwaarders (video openen) en kijk opnieuw: bij de meeste pc\'s verandert ze.');
+ const type=pv('pcType');if(!type)set('pcType','no','Kies laptop of desktop.');else set('pcType','ok','');
+ const gb=pnum('ramGb');if(isNaN(gb)||gb<1||gb>2048)set('ramGb','no','Vul het totaal in GB in (bv. 8, 16).');else set('ramGb','ok','Werkblad van '+gb+' GB.');
+ const mts=pnum('ramMts');if(isNaN(mts)||mts<400||mts>10000)set('ramMts','no','Vul de snelheid in MT/s in (bv. 2666, 3200, 4800).');else set('ramMts','ok','Dit is het getal na DDRx- (bv. DDR4-'+mts+').');
+ const su=pnum('slotUsed'),st=pnum('slotTot');if(isNaN(su)||isNaN(st)||su%1||st%1)set('slotTot','no','Vul beide getallen in (bv. 2 van 2).');else if(su>st||st<1||st>16)set('slotTot','no','Het eerste getal kan niet groter zijn dan het tweede.');else{set('slotTot','ok',su+' van '+st+' sleuven gebruikt'+(su<st?': er is nog '+(st-su)+' vrij.':'.'));set('slotUsed','ok','');}
+ const vorm=pv('vorm');if(!vorm)set('vorm','no','Kies de vormfactor.');else if(type==='Laptop'&&vorm==='DIMM')set('vorm','no','Een laptop gebruikt SO-DIMM, geen DIMM. Kijk opnieuw.');else if(type==='Desktop'&&vorm==='SODIMM')set('vorm','warn','Een desktop gebruikt meestal DIMM. Mini-pc\'s soms SO-DIMM. Kijk nog eens.');else set('vorm','ok',vorm==='SODIMM'?'SO-DIMM = kort latje voor laptops.':vorm==='DIMM'?'DIMM = lang latje voor desktops.':'Waarschijnlijk vastgesoldeerd geheugen.');
+ const gen=pv('gen');if(!gen)set('gen','no','Kies de generatie.');else if(!isNaN(mts)){const fits=GENS.filter(x=>mts>=x[1]&&mts<=x[2]).map(x=>x[0]);if(gen.startsWith('LPDDR'))set('gen','ok','Gesoldeerd laptopgeheugen: kan niet vervangen worden.');else if(!fits.includes(gen))set('gen','no',`${mts} MT/s past niet bij ${gen}. Kijk in de tabel${fits.length?': '+fits.join(' of '):''}.`);else set('gen','ok',`${mts} MT/s past bij ${gen}.`);}
+ const pn=pv('pcNaam');if(!pn)set('pcNaam','no','Reken de PC-naam uit.');else if(!isNaN(mts)){const want=gen&&!gen.startsWith('LP')?('PC'+gen.slice(3)+'-'+mts*8):null;const num=+((String(pn).match(/(\d+)\s*$/)||[])[1]);
+  if(num!==mts*8)set('pcNaam','no',num===mts*2?'Je deed × 2. Doe × 8.':'Het getal is '+fmt(mts)+' × 8 = ?');else if(want&&normMem(pn)!==normMem(want))set('pcNaam','no','Het getal klopt, maar de generatie niet: '+gen+' → PC'+gen.slice(3)+'.');else set('pcNaam','ok',`${fmt(mts)} × 8 = ${fmt(mts*8)} MB/s.`);}
+ const d=pv('dual');if(!d)set('dual','no','Kies ja of nee.');else if(!isNaN(su)){const want=su>=2?'Ja':'Nee';if(d!==want)set('dual','no',su>=2?'Met '+su+' latjes (zelfde type en capaciteit) werkt het waarschijnlijk in dual channel.':'Met 1 latje kan er maar één module per klokpuls aangesproken worden: single channel.');else set('dual','ok',want==='Ja'?'Dual channel: 2 modules tegelijk.':'Single channel: één module per klokpuls.');}
+ if(pv('bios').length<3)set('bios','no','Neem de BIOS-versie over uit msinfo32.');else set('bios','ok','Dit is de firmware op je moederbord.');
+ if(!pv('biosMode'))set('biosMode','no','Kies UEFI of Verouderd.');else set('biosMode','ok','');
+ if(pv('mobo').length<2)set('mobo','no','Neem de fabrikant van het basisbord over.');else set('mobo','ok','');
+ const rq=pv('romQ');if(!rq)set('romQ','no','Kies een antwoord.');else if(rq!=='Flash ROM')set('romQ','no','Niet juist: het BIOS moet bewaard blijven zonder stroom. Het staat in flash-ROM; bij het opstarten wordt het wel naar het RAM geschaduwd.');else set('romQ','ok','Juist. Een BIOS-update = flashen.');
+ const ko=pv('koel');if(!ko)set('koel','no','Kies een koeling.');else if(type==='Laptop'&&ko!=='Ventilator met koperen geleiding')set('koel','no','In een laptop is geen plaats voor een grote koeler: het is een ventilator met koperen geleiding.');else if(type==='Desktop'&&ko==='Ventilator met koperen geleiding')set('koel','no','Dat is typisch voor laptops. Een desktop heeft meestal een top-flow of tower koeler.');else if(ko==='Vloeibare stikstof')set('koel','no','Vloeibare stikstof wordt verbruikt en is niet voor gewone pc\'s.');else set('koel','ok','Past bij een '+(type||'computer').toLowerCase()+'.');
+ return m;}
+function renderPraktijk(){const m=pcheck();
+ const secs=PF.map(s=>`<section class="panel"><h3>${s.sec}</h3><p>${s.how}</p><div class="grid2">${s.fields.map(f=>{const v=esc(pv(f.id));const inp=f.type==='select'?`<select id="p_${f.id}">${f.opts.map(o=>`<option ${pv(f.id)===o?'selected':''} value="${esc(o)}">${o?esc(o):'Kies …'}</option>`).join('')}</select>`:`<input type="${f.type==='number'?'text':'text'}" ${f.type==='number'?'inputmode="decimal"':''} id="p_${f.id}" value="${v}" placeholder="${esc(f.ph||'')}" autocomplete="off">`;
+  const mm=m[f.id];const touched=S.prak['_t_'+f.id];return `<div class="field"><label for="p_${f.id}">${esc(f.lab)}</label>${inp}<div class="pm" data-for="${f.id}">${touched&&mm&&mm.t?`<span class="msg ${mm.cls}">${esc(mm.t)}</span>`:''}</div></div>`;}).join('')}</div>${s.sec.startsWith('2')?`<div class="tbl"><table><tr><th>Snelheid (MT/s)</th><th>Generatie</th></tr><tr><td class="num">800 – 2133</td><td>DDR3</td></tr><tr><td class="num">1600 – 3600</td><td>DDR4 (2133–3200 komt het meest voor)</td></tr><tr><td class="num">4000 – 8800</td><td>DDR5</td></tr></table><p class="small">Overlap (bv. 1600 of 2133)? Kies wat het beste past bij de leeftijd van je pc; beide worden goedgekeurd. Laptops met vastgesoldeerd geheugen (vormfactor niet vermeld) kiezen LPDDR.</p></div>`:''}</section>`).join('');
+ return `<div style="display:flex;flex-direction:column;gap:18px"><div class="panel"><p class="eyebrow">Praktijk</p><h2>Onderzoek je eigen computer</h2><p class="lead">Zoek de gegevens op je eigen Windows-pc op. De app controleert of wat je invult kan kloppen en legt uit wat het betekent. Op het einde maak je een verslag en neem je er een screenshot van (Windows-toets + Shift + S).</p>
+ <div class="grid2"><div class="field"><label for="p_naam">Naam</label><input type="text" id="p_naam" value="${esc(S.naam)}" autocomplete="name"></div><div class="field"><label for="p_klas">Klas</label><input type="text" id="p_klas" value="${esc(S.klas)}"></div></div>
+ <div class="row"><button class="btn ghost" type="button" id="pSample">Ik heb geen Windows-pc: vul de voorbeeldfiche in</button><button class="btn ghost" type="button" id="pCheckAll">Controleer alles</button></div>
+ <p class="small">De voorbeeldfiche vult de gegevens van een voorbeeld-schoollaptop in (geen echte pc). De vragen waarbij je moet nadenken (generatie, PC-naam, dual channel, ROM, koeling) vul je zelf in.</p></div>
+ ${secs}<div class="panel"><h3>Verslag</h3><p>Alles groen? Maak je verslag.</p><div class="row"><button class="btn acc" type="button" id="pReport">Maak mijn verslag</button></div><div id="pOut"></div></div></div>`;}
+function bindPraktijk(){const all=PF.flatMap(s=>s.fields);
+ const upd=()=>{const m=pcheck();all.forEach(f=>{const el=$('#p_'+f.id);const mm=m[f.id];const box=document.querySelector(`.pm[data-for="${f.id}"]`);if(!S.prak['_t_'+f.id]){box.innerHTML='';el.classList.remove('good','bad');return;}box.innerHTML=mm&&mm.t?`<span class="msg ${mm.cls}">${esc(mm.t)}</span>`:'';el.classList.toggle('good',!!mm&&mm.cls==='ok');el.classList.toggle('bad',!!mm&&mm.cls==='no');});};
+ all.forEach(f=>{const el=$('#p_'+f.id);const h=()=>{S.prak[f.id]=el.value;S.prak['_t_'+f.id]=1;save();upd();};el.addEventListener(f.type==='select'?'change':'input',h);});
+ $('#p_naam').oninput=ev=>{S.naam=ev.target.value;save();};$('#p_klas').oninput=ev=>{S.klas=ev.target.value;save();};
+ $('#pSample').onclick=()=>{Object.assign(S.prak,SAMPLE);S.prak.pcType='Laptop';S.prak._sample=1;Object.keys(SAMPLE).concat(['pcType']).forEach(k=>S.prak['_t_'+k]=1);S.prak.cpuMerk='';save();render();};
+ $('#pCheckAll').onclick=()=>{all.forEach(f=>S.prak['_t_'+f.id]=1);save();upd();};
+ upd();
+ $('#pReport').onclick=()=>{all.forEach(f=>S.prak['_t_'+f.id]=1);save();upd();const m=pcheck();const bad=all.filter(f=>!m[f.id]||m[f.id].cls==='no');
+  if(!S.naam.trim()||!S.klas.trim()){$('#pOut').innerHTML='<p class="msg no">Vul bovenaan je naam en klas in.</p>';return;}
+  if(bad.length){$('#pOut').innerHTML=`<p class="msg no">Nog ${bad.length} veld(en) in het rood: ${bad.map(f=>esc(f.lab)).join(' · ')}. Verbeter ze eerst.</p>`;return;}
+  const mts=pnum('ramMts');const now=new Date();const code=hashStr(norm(S.naam)+'|'+norm(S.klas)+'|'+pv('cpuNaam')+'|'+mts+'|'+now.toISOString().slice(0,10)).slice(0,6).toUpperCase();
+  $('#pOut').innerHTML=`<div class="report" id="pRep"><div><p class="eyebrow">Praktijkverslag PC-hardware${S.prak._sample?' · voorbeeldfiche':''}</p><h3>${esc(S.naam)} · ${esc(S.klas)}</h3><p class="small">${now.toLocaleDateString('nl-BE')} ${now.toLocaleTimeString('nl-BE',{hour:'2-digit',minute:'2-digit'})} · verslagcode <b>${code}</b></p></div>
+  <div class="tbl"><table><tr><th>Onderdeel</th><th>Mijn pc</th><th>Wat betekent het?</th></tr>
+  <tr><td>Processor</td><td>${esc(pv('cpuNaam'))}</td><td>Merk ${esc(pv('cpuMerk').split(' (')[0])}; ${esc(pv('cpuKern'))} kernen (koks), ${esc(pv('cpuLog'))} logische processors</td></tr>
+  <tr><td>Kloksnelheid</td><td>${esc(pv('cpuGhz'))} GHz</td><td>${esc(pv('cpuGhz').replace('.',','))} miljard tikken/s; ${pv('cpuVar').startsWith('Ja')?'aangepast aan belasting':'bleef gelijk tijdens de meting'}</td></tr>
+  <tr><td>L3-cache</td><td>${esc(pv('cpuL3'))} MB</td><td>snel geheugen in de processor</td></tr>
+  <tr><td>Werkgeheugen</td><td>${esc(pv('ramGb'))} GB, ${esc(pv('ramMts'))} MT/s</td><td>${esc(pv('gen'))}${pv('gen').startsWith('LP')?'':'-'+esc(pv('ramMts'))} = ${esc(pv('pcNaam').toUpperCase())}</td></tr>
+  <tr><td>Sleuven, vorm</td><td>${esc(pv('slotUsed'))} van ${esc(pv('slotTot'))}, ${esc(pv('vorm'))}</td><td>${pv('dual')==='Ja'?'dual channel':'single channel'}</td></tr>
+  <tr><td>BIOS/UEFI</td><td>${esc(pv('bios'))} (${esc(pv('biosMode'))})</td><td>firmware in flash-ROM; moederbord ${esc(pv('mobo'))}</td></tr>
+  <tr><td>Koeling</td><td>${esc(pv('pcType'))}</td><td>${esc(pv('koel'))}</td></tr></table></div>
+  <p class="msg ok">Alle gegevens gecontroleerd. Neem nu een screenshot van dit verslag (Windows-toets + Shift + S).</p></div>`;$('#pRep').scrollIntoView({behavior:'smooth',block:'start'});};}
+
+/* ---------- controlecode ---------- */
+const SALT='PCHW-sleutelboek-2026';
+function norm(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');}
+function hashStr(s){let h=0x811c9dc5;s=s+'#'+SALT;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}let h2=0x12345678;for(let i=s.length-1;i>=0;i--){h2^=s.charCodeAt(i);h2=Math.imul(h2,0x5bd1e995)>>>0;}return (h.toString(36)+h2.toString(36)).toUpperCase();}
+const PARTS_T=['H1','H2','H3','H4','H5','H6','P'];
+const PLAN={H1:[['E1',4]],H2:[['E2',3],['E3',2]],H3:[['E4',2],['E5',2]],H4:[['E6',4]],H5:[['E7',4]],H6:[['E8',2],['E9',1],['E10',3]],P:[['E11',3]]};
+const PMAX={H1:4,H2:5,H3:4,H4:4,H5:4,H6:6,P:3};
+const EPOCH=Date.UTC(2026,0,1);
+function makeCode(naam,klas,parts,dateStr,mins,poging,leaves){let p7=0;parts.forEach(x=>p7=p7*7+x);const days=Math.round((Date.UTC(+dateStr.slice(0,4),+dateStr.slice(5,7)-1,+dateStr.slice(8,10))-EPOCH)/864e5);
+ let n=(((p7*4096+Math.max(0,Math.min(4095,days)))*256+Math.max(0,Math.min(255,mins)))*16+Math.max(0,Math.min(15,poging||1)))*16+Math.max(0,Math.min(15,leaves||0));const body=n.toString(36).toUpperCase();const chk=hashStr(norm(naam)+'|'+norm(klas)+'|'+body).slice(0,5);return body+'-'+chk;}
+function readCode(naam,klas,code){code=String(code||'').trim().toUpperCase().replace(/\s/g,'');const m=code.match(/^([0-9A-Z]+)-([0-9A-Z]{5})$/);if(!m)return {ok:false,why:'De code heeft niet de juiste vorm (bv. 1ABC2DEF-XY12Z).'};
+ const chk=hashStr(norm(naam)+'|'+norm(klas)+'|'+m[1]).slice(0,5);let n=parseInt(m[1],36);const leaves=n%16;n=Math.floor(n/16);const poging=n%16;n=Math.floor(n/16);const mins=n%256;n=Math.floor(n/256);const days=n%4096;n=Math.floor(n/4096);let p7=n;const parts=[];for(let i=0;i<7;i++){parts.unshift(p7%7);p7=Math.floor(p7/7);}const total=parts.reduce((a,b)=>a+b,0);
+ const d=new Date(EPOCH+days*864e5);const ok=chk===m[2]&&p7===0&&parts.every((x,i)=>x<=PMAX[PARTS_T[i]]);
+ return {ok,why:ok?'':'De code past niet bij deze naam en klas (let op spelling) of werd aangepast.',total,parts,date:d.toISOString().slice(0,10),mins,poging,leaves};}
+
+/* ---------- Eindtoets ---------- */
+function buildToets(){const qs=[];PARTS_T.forEach(p=>PLAN[p].forEach(([id,n])=>{const e=EX.find(x=>x.id===id);const seen=new Set(qs.map(q=>q.prompt));let c=0,g=0;while(c<n&&g<200){g++;let q=toMC(e.gen());if(q.type==='order'&&qs.some(x=>x.type==='order'))continue;if(seen.has(q.prompt))continue;seen.add(q.prompt);q.part=p;q.ans=null;if(q.type==='order')q.pool=shuffle(q.items);qs.push(q);c++;}}));
+ return shuffle(qs);}
+function renderToets(){const t=S.toets;
+ if(t&&t.finished)return renderRapport(t);
+ if(t&&!t.finished)return renderToetsVraag(t);
+ const open=toetsOpen();const list=REQ.map(id=>{const e=EX.find(x=>x.id===id);const n=okCount(id);return `<li><span>${esc(e.title)}</span><span class="pill ${n>=NEED?'ok':'todo'}">${n>=NEED?'✓ klaar':n+'/'+NEED}</span></li>`;}).join('');
+ return `<section class="panel"><p class="eyebrow">Eindtoets</p><h2>30 vragen over alle hoofdstukken</h2><p class="lead">Meerkeuzevragen en één volgordevraag, geen open vragen. Tijdens de toets zijn Theorie en Oefenen gesloten. Alles wordt automatisch verbeterd. Je kan terugbladeren tot je inlevert. Op het einde krijg je een rapport met een controlecode: neem er een screenshot van.</p>
+ ${open?`<p class="msg ok">De toets is open${S.unlocked&&!allDone()?' (ontgrendeld door de leerkracht)':''}.</p>`:`<div class="lockbox"><b>De toets is nog op slot.</b><span>Maak eerst elke oefening in Oefenen met minstens ${NEED} juiste antwoorden.</span></div>`}
+ <ul class="checklist">${list}</ul>
+ <div class="grid2"><div class="field"><label for="t_naam">Voornaam en naam</label><input type="text" id="t_naam" value="${esc(S.naam)}" autocomplete="name"></div><div class="field"><label for="t_klas">Klas</label><input type="text" id="t_klas" value="${esc(S.klas)}"></div></div>
+ <div class="row"><button class="btn acc" id="tStart" type="button" ${open?'':'disabled'}>Start de eindtoets</button><span id="tMsg" class="small"></span></div></section>`;}
+function renderToetsVraag(t){const i=t.i;const q=t.qs[i];const answered=t.qs.filter(x=>x.ans!=null&&!(Array.isArray(x.ans)&&x.ans.length<x.items.length)).length;let inp='';
+ if(q.type==='mc')inp=`<div class="opts">${q.options.map(o=>`<button class="opt" type="button" data-o="${esc(o)}" aria-pressed="${q.ans===o}">${esc(o)}</button>`).join('')}</div>`;
+ else if(q.type==='num'||q.type==='text')inp=`<div class="row"><input type="text" ${q.type==='num'?'inputmode="decimal"':''} id="tIn" value="${esc(q.ans||'')}" placeholder="${esc(q.placeholder||'')}" autocomplete="off" style="width:220px" aria-label="Jouw antwoord"><span>${esc(q.unit||'')}</span></div>`;
+ else {const ord=q.ans||[];inp=`<ol class="chosen">${ord.map(x=>`<li>${esc(x)}</li>`).join('')}</ol><div class="ordersel">${q.pool.map(x=>`<button type="button" data-i="${esc(x)}" ${ord.includes(x)?'disabled':''}>${esc(x)}</button>`).join('')}</div><div><button class="btn ghost" type="button" id="tOrdClr">Wis volgorde</button></div>`;}
+ const prompt=q.prompt.includes('<br>')?q.prompt:esc(q.prompt).replace(/&lt;b&gt;|&lt;\/b&gt;/g,m=>m.includes('/')?'</b>':'<b>');
+ return `<section class="panel"><div class="row" style="justify-content:space-between"><p class="eyebrow">Eindtoets · vraag ${i+1} van ${t.qs.length}</p><span class="small">${esc(t.naam)} · ${esc(t.klas)} · ${answered} beantwoord</span></div>
+ <div class="progress"><i style="width:${Math.round((i+1)/t.qs.length*100)}%"></i></div>
+ <div class="q"><p class="prompt">${prompt}</p>${inp}</div>
+ <div class="row"><button class="btn ghost" id="tPrev" type="button" ${i===0?'disabled':''}>Vorige</button>${i<t.qs.length-1?`<button class="btn" id="tNext" type="button">Volgende</button>`:''}<button class="btn acc" id="tEnd" type="button">Inleveren</button></div><div id="tConfirm"></div></section>`;}
+function bindToets(){const t=S.toets;
+ if(!t){const st=$('#tStart');const nm=$('#t_naam'),kl=$('#t_klas');nm.oninput=()=>{S.naam=nm.value;save();};kl.oninput=()=>{S.klas=kl.value;save();};
+  st.onclick=()=>{if(!nm.value.trim()||!kl.value.trim()){$('#tMsg').textContent='Vul eerst je naam en klas in.';return;}S.pogingen=(S.pogingen||0)+1;S.toets={poging:S.pogingen,leaves:0,naam:nm.value.trim(),klas:kl.value.trim(),start:Date.now(),qs:buildToets(),i:0,finished:false};save();render();};return;}
+ if(t.finished){const b=$('#tReview');if(b)b.onclick=()=>{$('#reviewBox').hidden=!$('#reviewBox').hidden;};const n=$('#tNew');if(n)n.onclick=()=>{$('#newConfirm').innerHTML=`<p class="msg warn">Een nieuwe toets vervangt dit rapport op dit toestel. Heb je al een screenshot? <button class="btn ghost" id="tNewYes" type="button">Ja, nieuwe toets</button></p>`;$('#tNewYes').onclick=()=>{S.toets=null;save();render();};};return;}
+ const q=t.qs[t.i];const box=$('#main');
+ box.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{q.ans=o.dataset.o;save();box.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===o?'true':'false'));});
+ const inp=$('#tIn');if(inp)inp.oninput=()=>{q.ans=inp.value;save();};
+ box.querySelectorAll('.ordersel button').forEach(b=>b.onclick=()=>{q.ans=(q.ans||[]).concat(b.dataset.i);save();render();});
+ const oc=$('#tOrdClr');if(oc)oc.onclick=()=>{q.ans=[];save();render();};
+ const pv_=$('#tPrev');pv_.onclick=()=>{t.i--;save();render();};const nx=$('#tNext');if(nx)nx.onclick=()=>{t.i++;save();render();};
+ $('#tEnd').onclick=()=>{const open=t.qs.filter(x=>x.ans==null||x.ans===''||(Array.isArray(x.ans)&&x.ans.length<x.items.length)).length;
+  $('#tConfirm').innerHTML=`<div class="lockbox"><b>${open?`Je hebt nog ${open} vraag/vragen niet (volledig) beantwoord.`:'Alle vragen zijn beantwoord.'}</b><span>Na inleveren kan je niets meer veranderen.</span><div class="row"><button class="btn acc" id="tEndYes" type="button">Ja, lever in</button><button class="btn ghost" id="tEndNo" type="button">Nog even nakijken</button></div></div>`;
+  $('#tEndNo').onclick=()=>{$('#tConfirm').innerHTML='';};$('#tEndYes').onclick=()=>finishToets();};}
+function finishToets(){const t=S.toets;t.end=Date.now();const parts={};PARTS_T.forEach(p=>parts[p]=0);
+ t.qs.forEach(q=>{const r=q.ans==null?{ok:false}:judge(q,q.ans);q.ok=!!(r&&r.ok);if(q.ok)parts[q.part]++;});
+ t.parts=PARTS_T.map(p=>parts[p]);t.total=t.parts.reduce((a,b)=>a+b,0);const d=new Date(t.start);t.date=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;t.mins=Math.max(0,Math.round((t.end-t.start)/60000));
+ t.code=makeCode(t.naam,t.klas,t.parts,t.date,t.mins,t.poging,t.leaves);t.finished=true;save();render();window.scrollTo(0,0);}
+function renderRapport(t){const st=new Date(t.start),en=new Date(t.end);const hm=d=>d.toLocaleTimeString('nl-BE',{hour:'2-digit',minute:'2-digit'});
+ const dur=Math.round((t.end-t.start)/1000);const durTxt=`${Math.floor(dur/60)} min ${String(dur%60).padStart(2,'0')} s`;
+ const rows=PARTS_T.map((p,i)=>`<tr><td>${p==='P'?'Praktijk':p} · ${esc(CH[p].replace('Praktijk: ',''))}</td><td class="num">${t.parts[i]} / ${PMAX[p]}</td><td style="width:30%"><div class="bar"><i style="width:${Math.round(t.parts[i]/PMAX[p]*100)}%"></i></div></td></tr>`).join('');
+ const review=t.qs.map((q,i)=>`<div class="fb ${q.ok?'ok':'no'}"><b>${i+1}. ${q.ok?'Juist':'Fout'}</b> · ${q.prompt.includes('<br>')?q.prompt:esc(q.prompt).replace(/&lt;b&gt;|&lt;\/b&gt;/g,m=>m.includes('/')?'</b>':'<b>')}<br>Jouw antwoord: ${esc(q.ans==null||q.ans===''?'(leeg)':Array.isArray(q.ans)?q.ans.map((x,j)=>(j+1)+'. '+x).join(' '):q.ans)}${q.ok?'':`<br>Juist: ${esc(ansText(q))}. ${esc(q.why)}`}</div>`).join('');
+ return `<section class="panel"><div class="report"><div><p class="eyebrow">Rapport eindtoets PC-hardware</p><h2>${esc(t.naam)}</h2></div>
+ <dl class="kv"><dt>Klas</dt><dd>${esc(t.klas)}</dd><dt>Datum</dt><dd>${st.toLocaleDateString('nl-BE')}</dd><dt>Tijd</dt><dd>${hm(st)} – ${hm(en)}</dd><dt>Duur</dt><dd>${durTxt}</dd><dt>Poging</dt><dd>${t.poging||1}</dd><dt>Toets verlaten</dt><dd>${t.leaves||0} keer (ander tabblad of venster)</dd><dt>Score</dt><dd style="font-size:22px">${t.total} / 30 (${Math.round(t.total/30*100)} %)</dd></dl>
+ <div class="tbl"><table><tr><th>Onderdeel</th><th>Score</th><th>Grafiek</th></tr>${rows}</table></div>
+ <div><p class="small">Controlecode</p><span class="code">${t.code}</span></div>
+ <p class="msg ok">Neem nu een screenshot van dit rapport (Windows-toets + Shift + S) en bezorg het aan je leerkracht.</p></div>
+ <div class="row"><button class="btn ghost" id="tReview" type="button">Bekijk mijn antwoorden</button><button class="btn ghost" id="tNew" type="button">Nieuwe toets maken</button></div><div id="newConfirm"></div>
+ <div id="reviewBox" hidden style="display:flex;flex-direction:column;gap:8px">${review}</div></section>`;}
+
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.toets&&!S.toets.finished){S.toets.leaves=(S.toets.leaves||0)+1;save();}});
+/* ---------- leerkracht ---------- */
+$('#teachBtn').onclick=()=>openTeacher();
+function openTeacher(){const r=$('#modalRoot');r.innerHTML=`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="tkT"><div><h2 id="tkT">Leerkracht</h2><div id="tkBody"><div class="field"><label for="tkCode">Leerkrachtcode</label><input type="text" id="tkCode" inputmode="numeric" autocomplete="off"></div><div class="row"><button class="btn acc" id="tkGo" type="button">Open</button><button class="btn ghost" id="tkClose" type="button">Sluiten</button></div><div id="tkMsg"></div></div></div></div>`;
+ const close=()=>r.innerHTML='';$('#tkClose').onclick=close;r.querySelector('.modal').onclick=ev=>{if(ev.target.classList.contains('modal'))close();};
+ const c=$('#tkCode');c.focus();c.onkeydown=ev=>{if(ev.key==='Enter')$('#tkGo').click();};
+ $('#tkGo').onclick=()=>{if(c.value.trim()!=='2026'){$('#tkMsg').innerHTML='<p class="msg no">Onjuiste code.</p>';return;}
+  $('#tkBody').innerHTML=`<p>Toets op dit toestel: <b id="tkState">${toetsOpen()?'open':'op slot'}</b>. Oefeningen klaar: ${REQ.filter(id=>okCount(id)>=NEED).length}/${REQ.length}.</p>
+  <div class="row"><button class="btn acc" id="tkUnlock" type="button">${S.unlocked?'Vergrendel de toets opnieuw':'Ontgrendel de toets'}</button></div>
+  <h3>Rapportcode controleren</h3><p class="small">Typ naam en klas exact zoals op het rapport, en de controlecode.</p>
+  <div class="field"><label for="vNaam">Naam</label><input type="text" id="vNaam"></div><div class="field"><label for="vKlas">Klas</label><input type="text" id="vKlas"></div><div class="field"><label for="vCode">Controlecode</label><input type="text" id="vCode" autocomplete="off"></div>
+  <div class="row"><button class="btn" id="vGo" type="button">Controleer code</button></div><div id="vOut"></div>
+  <h3>Dit toestel</h3><div class="row"><button class="btn ghost" id="tkReset" type="button">Wis alle voortgang op dit toestel</button></div><div id="tkRes"></div>
+  <div class="row"><button class="btn ghost" id="tkClose2" type="button">Sluiten</button></div>`;
+  $('#tkClose2').onclick=close;
+  $('#tkUnlock').onclick=()=>{S.unlocked=!S.unlocked;save();$('#tkUnlock').textContent=S.unlocked?'Vergrendel de toets opnieuw':'Ontgrendel de toets';$('#tkState').textContent=toetsOpen()?'open':'op slot';render();};
+  $('#vGo').onclick=()=>{const r2=readCode($('#vNaam').value,$('#vKlas').value,$('#vCode').value);
+   $('#vOut').innerHTML=r2.ok?`<div class="fb ok"><b>Echt rapport.</b><br>Score ${r2.total}/30 · datum ${r2.date.split('-').reverse().join('/')} · duur ± ${r2.mins} min · poging ${r2.poging} · toets ${r2.leaves} keer verlaten${r2.leaves>=15?' of meer':''}<br>${PARTS_T.map((p,i)=>(p==='P'?'Praktijk':p)+': '+r2.parts[i]+'/'+PMAX[p]).join(' · ')}</div>`:`<div class="fb no"><b>Niet geldig.</b> ${esc(r2.why)}</div>`;};
+  $('#tkReset').onclick=()=>{$('#tkRes').innerHTML=`<p class="msg warn">Alles wissen (oefeningen, praktijk, toets)? <button class="btn ghost" id="tkResYes" type="button">Ja, wis</button></p>`;$('#tkResYes').onclick=()=>{S={naam:'',klas:'',prog:{},unlocked:false,prak:{},toets:null,lastTab:'theorie'};save();close();render();};};};}
+
+/* ---------- start ---------- */
+const h=(location.hash||'').slice(1);setTab(['theorie','oefenen','praktijk','toets'].includes(h)?h:(S.lastTab||'theorie'));
+window.__pchw={EX,S:()=>S,Q,judge,makeCode,readCode,buildToets,finishToets};
+</script>
+
+</body></html>
